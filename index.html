@@ -366,7 +366,7 @@ a{color:var(--accent);}
   color:var(--text-muted);
 }
 .iconbtn:hover{border-color:var(--accent); color:var(--accent);}
-.iconbtn svg{width:18px;height:18px;}
+.iconbtn svg{width:18px;height:18px;stroke:currentColor;}
 .iconbtn:disabled{opacity:.35; cursor:default; pointer-events:none;}
 .status-btn{
   padding:11px 18px; border-radius:10px; font-weight:700; font-size:13.5px; cursor:pointer; border:1px solid;
@@ -562,7 +562,7 @@ a{color:var(--accent);}
           <button class="iconbtn" id="fc-prev" title="前へ" aria-label="前へ"><svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 18l-6-6 6-6"/></svg></button>
           <button class="status-btn review" id="fc-mark-review">もう一度</button>
           <button class="status-btn mastered" id="fc-mark-mastered">覚えた</button>
-          <button class="iconbtn" id="fc-reset" title="判定をリセット" aria-label="判定をリセット"><svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 12a9 9 0 1 0 3-6.7"/><path d="M3 4v5h5"/></svg></button>
+          <button class="iconbtn" id="fc-reset" title="判定をリセット" aria-label="判定をリセット"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="1 4 1 10 7 10"/><path d="M3.51 15a9 9 0 1 0 2.13-9.36L1 10"/></svg></button>
           <button class="iconbtn" id="fc-next" title="次へ" aria-label="次へ"><svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 18l6-6-6-6"/></svg></button>
           <button class="iconbtn" id="fc-shuffle" title="シャッフル" aria-label="シャッフル"><svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M16 3h5v5M4 20L21 3M21 16v5h-5M15 15l6 6M4 4l5 5"/></svg></button>
         </div>
