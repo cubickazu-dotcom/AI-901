@@ -1,0 +1,1314 @@
+<title>AI-901 攻略ラボ</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Zen+Kaku+Gothic+New:wght@500;700;900&family=Noto+Sans+JP:wght@400;500;700&family=JetBrains+Mono:wght@500;700&display=swap">
+<style>
+/* ============ TOKENS ============ */
+:root{
+  --bg:#F1F4FA;
+  --bg-alt:#E7ECF7;
+  --surface:#FFFFFF;
+  --surface-2:#F8FAFD;
+  --border:#DDE3F0;
+  --text:#161B2C;
+  --text-muted:#5B6478;
+  --text-faint:#8891A8;
+  --accent:#2C4BD4;
+  --accent-strong:#1E3AA8;
+  --accent-soft:#E7ECFF;
+  --accent-contrast:#FFFFFF;
+  --success:#128F63;
+  --success-soft:#E1F5EC;
+  --danger:#D6455A;
+  --danger-soft:#FCE7EA;
+  --warning:#B8790F;
+  --warning-soft:#FBF0DC;
+  --shadow: 220 45% 25%;
+  --ch1:#2C4BD4; --ch2:#7B3FE4; --ch3:#0E8F7A; --ch4:#C9701A; --ch5:#B23B7A; --ch6:#1F7FBF;
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){
+    --bg:#0C1120;
+    --bg-alt:#121A2E;
+    --surface:#151E33;
+    --surface-2:#1B2540;
+    --border:#2B3859;
+    --text:#E8ECFB;
+    --text-muted:#9BA6C4;
+    --text-faint:#6C7796;
+    --accent:#7E9DFF;
+    --accent-strong:#AEC1FF;
+    --accent-soft:#1E2A4D;
+    --accent-contrast:#0C1120;
+    --success:#4FD9A4;
+    --success-soft:#11311F;
+    --danger:#FF8695;
+    --danger-soft:#391720;
+    --warning:#E8B563;
+    --warning-soft:#382A0F;
+    --ch1:#8CA6FF; --ch2:#B39BFF; --ch3:#5BD1B3; --ch4:#F0AE60; --ch5:#F090BE; --ch6:#7FC4F2;
+  }
+}
+:root[data-theme="dark"]{
+  --bg:#0C1120;
+  --bg-alt:#121A2E;
+  --surface:#151E33;
+  --surface-2:#1B2540;
+  --border:#2B3859;
+  --text:#E8ECFB;
+  --text-muted:#9BA6C4;
+  --text-faint:#6C7796;
+  --accent:#7E9DFF;
+  --accent-strong:#AEC1FF;
+  --accent-soft:#1E2A4D;
+  --accent-contrast:#0C1120;
+  --success:#4FD9A4;
+  --success-soft:#11311F;
+  --danger:#FF8695;
+  --danger-soft:#391720;
+  --warning:#E8B563;
+  --warning-soft:#382A0F;
+  --ch1:#8CA6FF; --ch2:#B39BFF; --ch3:#5BD1B3; --ch4:#F0AE60; --ch5:#F090BE; --ch6:#7FC4F2;
+}
+
+*{box-sizing:border-box;}
+html{color-scheme:light dark;}
+body{
+  margin:0;
+  background:var(--bg);
+  color:var(--text);
+  font-family:"Noto Sans JP","Hiragino Kaku Gothic ProN",sans-serif;
+  -webkit-font-smoothing:antialiased;
+  line-height:1.6;
+}
+h1,h2,h3,h4{
+  font-family:"Zen Kaku Gothic New","Noto Sans JP",sans-serif;
+  text-wrap:balance;
+  margin:0;
+}
+.mono{font-family:"JetBrains Mono",monospace;}
+button{font-family:inherit;}
+a{color:var(--accent);}
+::selection{background:var(--accent-soft);}
+
+/* ============ APP SHELL ============ */
+#app{
+  display:flex;
+  min-height:100vh;
+}
+
+/* --- Sidebar (desktop) --- */
+.sidebar{
+  width:230px;
+  flex:none;
+  background:var(--surface);
+  border-right:1px solid var(--border);
+  display:flex;
+  flex-direction:column;
+  padding:20px 14px;
+  gap:22px;
+  position:sticky;
+  top:0;
+  height:100vh;
+}
+.brand{
+  display:flex;
+  align-items:center;
+  gap:10px;
+  padding:0 6px;
+}
+.brand-badge{
+  font-family:"JetBrains Mono",monospace;
+  font-weight:700;
+  font-size:12px;
+  letter-spacing:.04em;
+  background:var(--accent);
+  color:var(--accent-contrast);
+  padding:4px 7px;
+  border-radius:6px;
+}
+.brand-name{
+  font-family:"Zen Kaku Gothic New",sans-serif;
+  font-weight:900;
+  font-size:16.5px;
+  letter-spacing:.01em;
+}
+.nav{
+  display:flex;
+  flex-direction:column;
+  gap:3px;
+}
+.nav-item{
+  display:flex;
+  align-items:center;
+  gap:11px;
+  padding:10px 12px;
+  border-radius:10px;
+  color:var(--text-muted);
+  cursor:pointer;
+  font-size:14.5px;
+  font-weight:500;
+  border:1px solid transparent;
+  background:none;
+  text-align:left;
+  width:100%;
+}
+.nav-item svg{flex:none;width:18px;height:18px;stroke:currentColor;}
+.nav-item:hover{background:var(--surface-2); color:var(--text);}
+.nav-item.active{
+  background:var(--accent-soft);
+  color:var(--accent-strong);
+  font-weight:700;
+}
+.sidebar-foot{
+  margin-top:auto;
+  padding:10px 6px 0;
+  font-size:12px;
+  color:var(--text-faint);
+  border-top:1px solid var(--border);
+  padding-top:14px;
+}
+
+/* --- Main --- */
+.main{
+  flex:1;
+  min-width:0;
+  padding:34px 40px 100px;
+}
+.view{max-width:980px; margin:0 auto;}
+.view[hidden]{display:none;}
+
+.page-head{
+  margin-bottom:26px;
+  display:flex;
+  flex-direction:column;
+  gap:4px;
+}
+.page-head .eyebrow{
+  font-family:"JetBrains Mono",monospace;
+  font-size:11.5px;
+  font-weight:700;
+  letter-spacing:.08em;
+  color:var(--accent);
+  text-transform:uppercase;
+}
+.page-head h1{font-size:26px; font-weight:900;}
+.page-head p{color:var(--text-muted); font-size:14.5px; margin-top:2px;}
+
+/* ============ CARDS / GRID ============ */
+.stat-row{
+  display:grid;
+  grid-template-columns:repeat(4,1fr);
+  gap:14px;
+  margin-bottom:28px;
+}
+.stat-card{
+  background:var(--surface);
+  border:1px solid var(--border);
+  border-radius:14px;
+  padding:16px 18px;
+  display:flex;
+  flex-direction:column;
+  gap:6px;
+}
+.stat-card .num{
+  font-family:"JetBrains Mono",monospace;
+  font-weight:700;
+  font-size:24px;
+  font-variant-numeric:tabular-nums;
+}
+.stat-card .lbl{font-size:12.5px; color:var(--text-muted);}
+
+.chapter-grid{
+  display:grid;
+  grid-template-columns:repeat(2,1fr);
+  gap:14px;
+}
+.chapter-card{
+  background:var(--surface);
+  border:1px solid var(--border);
+  border-radius:16px;
+  padding:18px;
+  display:flex;
+  flex-direction:column;
+  gap:12px;
+  cursor:pointer;
+  text-align:left;
+  position:relative;
+  overflow:hidden;
+}
+.chapter-card::before{
+  content:"";
+  position:absolute; inset:0 0 auto 0; height:4px;
+  background:var(--ch-color);
+}
+.chapter-card .ch-top{
+  display:flex; align-items:center; justify-content:space-between;
+}
+.chapter-card .ch-num{
+  font-family:"JetBrains Mono",monospace;
+  font-weight:700;
+  font-size:12px;
+  color:var(--ch-color);
+  background:color-mix(in srgb, var(--ch-color) 14%, transparent);
+  padding:3px 8px;
+  border-radius:999px;
+}
+.chapter-card h3{font-size:16px; font-weight:700; line-height:1.4;}
+.chapter-card .ch-meta{
+  display:flex; justify-content:space-between; align-items:center;
+  font-size:12px; color:var(--text-muted);
+}
+.progress-track{
+  height:6px; border-radius:999px; background:var(--bg-alt); overflow:hidden;
+}
+.progress-fill{
+  height:100%; border-radius:999px; background:var(--ch-color);
+}
+
+.panel{
+  background:var(--surface);
+  border:1px solid var(--border);
+  border-radius:16px;
+  padding:22px;
+}
+
+/* ============ PILLS / BUTTONS ============ */
+.pill-row{display:flex; gap:8px; flex-wrap:wrap; margin-bottom:20px;}
+.pill{
+  border:1px solid var(--border);
+  background:var(--surface);
+  color:var(--text-muted);
+  padding:7px 14px;
+  border-radius:999px;
+  font-size:13.5px;
+  font-weight:500;
+  cursor:pointer;
+}
+.pill:hover{border-color:var(--accent);}
+.pill.active{
+  background:var(--accent);
+  color:var(--accent-contrast);
+  border-color:var(--accent);
+  font-weight:700;
+}
+.btn{
+  font-weight:700;
+  font-size:14px;
+  border-radius:10px;
+  padding:11px 20px;
+  border:1px solid transparent;
+  cursor:pointer;
+}
+.btn-primary{background:var(--accent); color:var(--accent-contrast);}
+.btn-primary:hover{background:var(--accent-strong);}
+.btn-ghost{background:var(--surface); border-color:var(--border); color:var(--text);}
+.btn-ghost:hover{border-color:var(--accent); color:var(--accent);}
+.btn-row{display:flex; gap:10px; flex-wrap:wrap;}
+.btn:disabled{opacity:.45; cursor:not-allowed;}
+
+/* ============ FLASHCARDS ============ */
+.fc-wrap{display:flex; flex-direction:column; align-items:center; gap:20px;}
+.fc-progress{
+  width:100%; display:flex; align-items:center; gap:12px; font-size:13px; color:var(--text-muted);
+}
+.fc-progress .progress-track{flex:1; background:var(--bg-alt); --ch-color:var(--accent);}
+.fc-progress .progress-fill{background:var(--accent);}
+.flashcard{
+  width:100%;
+  max-width:560px;
+  min-height:280px;
+  perspective:1400px;
+  cursor:pointer;
+}
+.flashcard-inner{
+  position:relative;
+  width:100%; height:100%; min-height:280px;
+  transform-style:preserve-3d;
+  transition:transform .5s cubic-bezier(.2,.7,.3,1);
+}
+.flashcard.flipped .flashcard-inner{transform:rotateY(180deg);}
+.fc-face{
+  position:absolute; inset:0;
+  backface-visibility:hidden;
+  border-radius:20px;
+  border:1px solid var(--border);
+  background:var(--surface);
+  display:flex;
+  flex-direction:column;
+  align-items:center;
+  justify-content:center;
+  text-align:center;
+  padding:36px 30px;
+  gap:16px;
+  box-shadow:0 12px 30px -18px hsl(var(--shadow) / .35);
+}
+.fc-face.back{transform:rotateY(180deg); background:var(--accent-soft);}
+.fc-tag{
+  font-family:"JetBrains Mono",monospace;
+  font-size:11px; font-weight:700; letter-spacing:.05em;
+  color:var(--ch-color, var(--accent));
+  background:color-mix(in srgb, var(--ch-color, var(--accent)) 14%, transparent);
+  padding:3px 9px; border-radius:999px;
+  position:absolute; top:16px; left:16px;
+}
+.fc-hint{position:absolute; bottom:14px; font-size:11.5px; color:var(--text-faint);}
+.fc-term{font-size:26px; font-weight:900; font-family:"Zen Kaku Gothic New";}
+.fc-def{font-size:16px; color:var(--text); max-width:440px;}
+.fc-controls{display:flex; gap:10px; align-items:center; flex-wrap:wrap; justify-content:center;}
+.iconbtn{
+  width:42px; height:42px; border-radius:50%;
+  border:1px solid var(--border); background:var(--surface);
+  display:flex; align-items:center; justify-content:center; cursor:pointer;
+  color:var(--text-muted);
+}
+.iconbtn:hover{border-color:var(--accent); color:var(--accent);}
+.iconbtn svg{width:18px;height:18px;}
+.status-btn{
+  padding:11px 18px; border-radius:10px; font-weight:700; font-size:13.5px; cursor:pointer; border:1px solid;
+}
+.status-btn.review{background:var(--danger-soft); border-color:transparent; color:var(--danger);}
+.status-btn.mastered{background:var(--success-soft); border-color:transparent; color:var(--success);}
+.status-btn:hover{filter:brightness(0.96);}
+
+/* ============ QUIZ ============ */
+.quiz-setup .pill-row{margin-bottom:6px;}
+.setup-label{font-size:12.5px; font-weight:700; color:var(--text-muted); text-transform:uppercase; letter-spacing:.06em; margin:18px 0 10px;}
+.q-progress{display:flex; align-items:center; justify-content:space-between; margin-bottom:16px; font-size:13px; color:var(--text-muted);}
+.q-timer{font-family:"JetBrains Mono",monospace; font-weight:700; color:var(--text);}
+.q-timer.low{color:var(--danger);}
+.q-card{background:var(--surface); border:1px solid var(--border); border-radius:18px; padding:26px; margin-bottom:18px;}
+.q-tag{font-family:"JetBrains Mono",monospace; font-size:11px; font-weight:700; color:var(--ch-color,var(--accent)); margin-bottom:10px; display:inline-block;}
+.q-text{font-size:18px; font-weight:700; margin-bottom:20px; line-height:1.6;}
+.opt-list{display:flex; flex-direction:column; gap:10px;}
+.opt{
+  display:flex; gap:12px; align-items:flex-start;
+  padding:14px 16px;
+  border-radius:12px;
+  border:1.5px solid var(--border);
+  background:var(--surface-2);
+  cursor:pointer;
+  font-size:14.5px;
+  text-align:left;
+}
+.opt:hover{border-color:var(--accent);}
+.opt .opt-letter{
+  font-family:"JetBrains Mono",monospace; font-weight:700; flex:none;
+  width:24px; height:24px; border-radius:50%; background:var(--bg-alt);
+  display:flex; align-items:center; justify-content:center; font-size:12px;
+}
+.opt.correct{border-color:var(--success); background:var(--success-soft);}
+.opt.correct .opt-letter{background:var(--success); color:#fff;}
+.opt.incorrect{border-color:var(--danger); background:var(--danger-soft);}
+.opt.incorrect .opt-letter{background:var(--danger); color:#fff;}
+.opt.disabled{cursor:default;}
+.explain{
+  margin-top:16px; padding:14px 16px; border-radius:12px;
+  background:var(--accent-soft); color:var(--text); font-size:13.5px; line-height:1.7;
+  border-left:3px solid var(--accent);
+}
+.explain b{color:var(--accent-strong);}
+
+.result-hero{
+  text-align:center; padding:34px 20px; background:var(--surface);
+  border:1px solid var(--border); border-radius:18px; margin-bottom:22px;
+}
+.result-score{font-family:"JetBrains Mono",monospace; font-size:52px; font-weight:700; font-variant-numeric:tabular-nums;}
+.result-score span{font-size:22px; color:var(--text-muted);}
+.result-msg{font-size:15px; color:var(--text-muted); margin-top:6px;}
+.chapter-breakdown{display:flex; flex-direction:column; gap:10px; margin:20px 0;}
+.cb-row{display:flex; align-items:center; gap:12px; font-size:13px;}
+.cb-row .cb-name{width:150px; flex:none; color:var(--text-muted);}
+.cb-row .progress-track{flex:1;}
+.cb-row .cb-pct{width:42px; text-align:right; font-family:"JetBrains Mono",monospace; font-weight:700;}
+.review-list{display:flex; flex-direction:column; gap:12px;}
+.review-item{background:var(--surface); border:1px solid var(--border); border-radius:12px; padding:14px 16px;}
+.review-item .rq{font-weight:700; font-size:14px; margin-bottom:8px;}
+.review-item .ra{font-size:13px; color:var(--text-muted); display:flex; gap:6px;}
+.review-item .ra b{color:var(--text);}
+.review-item .ra.wrong b{color:var(--danger);}
+.review-item .ra.right b{color:var(--success);}
+
+/* ============ GLOSSARY ============ */
+.search-box{
+  display:flex; align-items:center; gap:10px;
+  border:1px solid var(--border); background:var(--surface);
+  border-radius:12px; padding:10px 14px; margin-bottom:18px;
+}
+.search-box svg{width:17px;height:17px; stroke:var(--text-faint); flex:none;}
+.search-box input{
+  border:none; outline:none; background:none; color:var(--text); font-size:14.5px; width:100%;
+  font-family:inherit;
+}
+.gloss-group{margin-bottom:26px;}
+.gloss-group h3{
+  font-size:13px; font-weight:700; text-transform:uppercase; letter-spacing:.06em;
+  color:var(--gc,var(--accent)); margin-bottom:10px;
+}
+.gloss-item{
+  padding:14px 0; border-bottom:1px solid var(--border);
+}
+.gloss-item:last-child{border-bottom:none;}
+.gloss-item dt{font-weight:700; font-size:14.5px; margin-bottom:4px;}
+.gloss-item dd{margin:0; font-size:13.5px; color:var(--text-muted);}
+.empty-note{color:var(--text-faint); font-size:13.5px; padding:20px 0;}
+
+/* ============ Bottom tab bar (mobile) ============ */
+.tabbar{
+  display:none;
+  position:fixed; bottom:0; left:0; right:0;
+  background:var(--surface);
+  border-top:1px solid var(--border);
+  padding:6px 4px calc(6px + env(safe-area-inset-bottom));
+  z-index:20;
+}
+.tabbar-row{display:flex;}
+.tabbar .nav-item{
+  flex-direction:column; align-items:center; gap:2px; font-size:10.5px; flex:1; padding:6px 2px; border-radius:10px;
+}
+
+@media (max-width: 860px){
+  .sidebar{display:none;}
+  .tabbar{display:block;}
+  .main{padding:22px 16px 90px;}
+  .stat-row{grid-template-columns:repeat(2,1fr);}
+  .chapter-grid{grid-template-columns:1fr;}
+  .cb-row .cb-name{width:96px; font-size:12px;}
+}
+@media (max-width:480px){
+  .fc-term{font-size:21px;}
+  .flashcard{min-height:250px;}
+  .flashcard-inner{min-height:250px;}
+}
+</style>
+
+<div id="app">
+  <!-- ===== Sidebar ===== -->
+  <nav class="sidebar" aria-label="メインナビゲーション">
+    <div class="brand">
+      <span class="brand-badge">AI-901</span>
+      <span class="brand-name">攻略ラボ</span>
+    </div>
+    <div class="nav" id="nav-desktop"></div>
+    <div class="sidebar-foot">進捗はこのブラウザに保存されます</div>
+  </nav>
+
+  <main class="main">
+    <!-- ===== HOME ===== -->
+    <section class="view" id="view-home">
+      <div class="page-head">
+        <span class="eyebrow">Dashboard</span>
+        <h1 id="home-greeting">ようこそ</h1>
+        <p>Microsoft Azure AI Fundamentals 認定資格に向けて、6つの章を攻略しましょう。</p>
+      </div>
+
+      <div class="stat-row">
+        <div class="stat-card">
+          <div class="num mono" id="stat-mastered">0</div>
+          <div class="lbl">覚えたカード</div>
+        </div>
+        <div class="stat-card">
+          <div class="num mono" id="stat-total-cards">0</div>
+          <div class="lbl">総カード数</div>
+        </div>
+        <div class="stat-card">
+          <div class="num mono" id="stat-best-quiz">–</div>
+          <div class="lbl">章別クイズ 平均正答率</div>
+        </div>
+        <div class="stat-card">
+          <div class="num mono" id="stat-exam-best">–</div>
+          <div class="lbl">模擬試験 自己ベスト</div>
+        </div>
+      </div>
+
+      <div class="setup-label">章から学習を始める</div>
+      <div class="chapter-grid" id="chapter-grid"></div>
+    </section>
+
+    <!-- ===== FLASHCARDS ===== -->
+    <section class="view" id="view-flash" hidden>
+      <div class="page-head">
+        <span class="eyebrow">Flashcards</span>
+        <h1>フラッシュカード</h1>
+        <p>用語をタップして意味を確認し、習熟度を記録しましょう。</p>
+      </div>
+      <div class="pill-row" id="flash-chapter-pills"></div>
+      <div class="fc-wrap">
+        <div class="fc-progress">
+          <span class="mono" id="fc-count">0 / 0</span>
+          <div class="progress-track"><div class="progress-fill" id="fc-progress-fill" style="width:0%"></div></div>
+          <span class="mono" id="fc-mastered-count">覚えた 0</span>
+        </div>
+        <div class="flashcard" id="flashcard" tabindex="0">
+          <div class="flashcard-inner" id="flashcard-inner">
+            <div class="fc-face front">
+              <span class="fc-tag" id="fc-tag-front">第1章</span>
+              <div class="fc-term" id="fc-term">読み込み中…</div>
+              <div class="fc-hint">タップ / クリックして答えを見る</div>
+            </div>
+            <div class="fc-face back">
+              <span class="fc-tag" id="fc-tag-back">第1章</span>
+              <div class="fc-def" id="fc-def">…</div>
+              <div class="fc-hint">タップしてもう一度</div>
+            </div>
+          </div>
+        </div>
+        <div class="fc-controls">
+          <button class="iconbtn" id="fc-prev" title="前へ" aria-label="前へ"><svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 18l-6-6 6-6"/></svg></button>
+          <button class="status-btn review" id="fc-mark-review">もう一度</button>
+          <button class="status-btn mastered" id="fc-mark-mastered">覚えた</button>
+          <button class="iconbtn" id="fc-next" title="次へ" aria-label="次へ"><svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 18l6-6-6-6"/></svg></button>
+          <button class="iconbtn" id="fc-shuffle" title="シャッフル" aria-label="シャッフル"><svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M16 3h5v5M4 20L21 3M21 16v5h-5M15 15l6 6M4 4l5 5"/></svg></button>
+        </div>
+      </div>
+    </section>
+
+    <!-- ===== CHAPTER QUIZ ===== -->
+    <section class="view" id="view-quiz" hidden>
+      <div class="page-head">
+        <span class="eyebrow">Chapter Quiz</span>
+        <h1>章別クイズ</h1>
+        <p>章を選んで、知識チェック問題に挑戦しましょう。</p>
+      </div>
+
+      <div id="quiz-setup" class="quiz-setup panel">
+        <div class="setup-label">章を選択</div>
+        <div class="pill-row" id="quiz-chapter-pills"></div>
+        <div class="btn-row">
+          <button class="btn btn-primary" id="quiz-start-btn">クイズを開始</button>
+        </div>
+      </div>
+
+      <div id="quiz-play" hidden></div>
+      <div id="quiz-result" hidden></div>
+    </section>
+
+    <!-- ===== MOCK EXAM ===== -->
+    <section class="view" id="view-exam" hidden>
+      <div class="page-head">
+        <span class="eyebrow">Mock Exam</span>
+        <h1>模擬試験</h1>
+        <p>全章からランダム出題。時間内に何問正解できるか試しましょう。</p>
+      </div>
+
+      <div id="exam-setup" class="quiz-setup panel">
+        <div class="setup-label">出題数</div>
+        <div class="pill-row" id="exam-count-pills"></div>
+        <p style="font-size:13px;color:var(--text-muted);margin:-6px 0 0;">目安時間: 1問あたり約1分30秒 &middot; 合格の目安は正答率70%です</p>
+        <div class="btn-row" style="margin-top:16px;">
+          <button class="btn btn-primary" id="exam-start-btn">模擬試験を開始</button>
+        </div>
+      </div>
+
+      <div id="exam-play" hidden></div>
+      <div id="exam-result" hidden></div>
+    </section>
+
+    <!-- ===== GLOSSARY ===== -->
+    <section class="view" id="view-glossary" hidden>
+      <div class="page-head">
+        <span class="eyebrow">Glossary</span>
+        <h1>用語集</h1>
+        <p>全79語を章別に一覧できます。試験直前の見直しにどうぞ。</p>
+      </div>
+      <div class="search-box">
+        <svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="7"/><path d="M21 21l-4.3-4.3"/></svg>
+        <input type="text" id="gloss-search" placeholder="用語を検索 (例: RAG、トークン化、OCR)">
+      </div>
+      <div class="pill-row" id="gloss-chapter-pills"></div>
+      <div id="gloss-list"></div>
+    </section>
+  </main>
+
+  <!-- ===== Mobile tab bar ===== -->
+  <nav class="tabbar" aria-label="モバイルナビゲーション">
+    <div class="nav tabbar-row" id="nav-mobile"></div>
+  </nav>
+</div>
+
+<script>
+(function(){
+"use strict";
+
+/* ============================================================
+   NAV DEFINITION
+   ============================================================ */
+var NAV = [
+  {id:"home", label:"ホーム", icon:'<path d="M3 11l9-7 9 7"/><path d="M5 9.5V21h14V9.5"/>'},
+  {id:"flash", label:"カード", icon:'<rect x="3" y="6" width="14" height="10" rx="2"/><path d="M7 3h14v10"/>'},
+  {id:"quiz", label:"クイズ", icon:'<circle cx="12" cy="12" r="9"/><path d="M9.5 9a2.5 2.5 0 0 1 5 0c0 1.7-2.5 2-2.5 4"/><circle cx="12" cy="17" r=".6" fill="currentColor" stroke="none"/>'},
+  {id:"exam", label:"模擬試験", icon:'<circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 3"/>'},
+  {id:"glossary", label:"用語集", icon:'<path d="M5 4h11a2 2 0 0 1 2 2v14l-6-3-6 3V6a2 2 0 0 1 2-2z"/><path d="M9 8h6M9 11h6"/>'}
+];
+
+/* ============================================================
+   CHAPTER DEFINITION
+   ============================================================ */
+var CHAPTERS = [
+  {id:1, title:"人工知能の概要", color:"var(--ch1)"},
+  {id:2, title:"生成AIとエージェントの概要", color:"var(--ch2)"},
+  {id:3, title:"自然言語処理", color:"var(--ch3)"},
+  {id:4, title:"AI 音声", color:"var(--ch4)"},
+  {id:5, title:"コンピュータービジョン", color:"var(--ch5)"},
+  {id:6, title:"情報抽出", color:"var(--ch6)"}
+];
+
+/* ============================================================
+   FLASHCARD DATA (79 terms)
+   ============================================================ */
+var FLASHCARDS = [
+// --- 第1章 人工知能の概要 ---
+{id:"c1-01",ch:1,term:"人工知能 (AI) の起源",def:"1956年のダートマス会議で、会議主催者のジョン・マッカーシー氏が提唱したことが起源とされる。"},
+{id:"c1-02",ch:1,term:"機械学習",def:"コンピューターにデータを与え、課題を解くためのルールやパターンをコンピューター自身に学習させる手法。"},
+{id:"c1-03",ch:1,term:"ディープラーニング (深層学習)",def:"人の神経回路を模したニューラルネットワークを幾重にも重ね、精度の高い機械学習を実現する手法のひとつ。"},
+{id:"c1-04",ch:1,term:"生成 AI",def:"自然言語・画像・コードなど、コンテンツを作成する AI のサブセット。"},
+{id:"c1-05",ch:1,term:"AI ブームの変遷",def:"第1次(推論と探索)→第2次(知識)→第3次(深層学習)→第4次(生成AI)と、ブームと冬の時代を繰り返して現在に至る。"},
+{id:"c1-06",ch:1,term:"人工知能ワークロードの5分野",def:"生成 AI とエージェント、テキストと言語、AI 音声、コンピュータービジョン、情報抽出の5分野。"},
+{id:"c1-07",ch:1,term:"ハルシネーション (Hallucination)",def:"生成 AI が事実に基づかない内容や文脈と無関係な内容を、あたかも事実であるかのように出力する現象。"},
+{id:"c1-08",ch:1,term:"バイアス",def:"偏り・偏見・先入観のこと。バイアスが作用すると AI の公平性が失われることがある。"},
+{id:"c1-09",ch:1,term:"責任ある AI の6原則",def:"Microsoft が AI の開発・使用の指針とする、公平性・信頼性と安全性・プライバシーとセキュリティ・包括性・透明性・アカウンタビリティの6つ。"},
+{id:"c1-10",ch:1,term:"公平性 (Fairness)",def:"AI システムはすべての人を公平に扱う必要があるという原則。性別や民族など特定グループが不当に扱われないようにする。"},
+{id:"c1-11",ch:1,term:"信頼性と安全性 (Reliability & Safety)",def:"AI システムは確実かつ安全に実行される必要があるという原則。厳格なテストやフェイルセーフ設計が含まれる。"},
+{id:"c1-12",ch:1,term:"フェイルセーフ",def:"システムに異常が発生した場合でも安全な側に動作させることで、人命などへの危険を防ぐ設計。"},
+{id:"c1-13",ch:1,term:"プライバシーとセキュリティ",def:"個人データの取り扱いに細心の注意を払う原則。収集・使用・保存に関する情報提供やマスキングなどが含まれる。"},
+{id:"c1-14",ch:1,term:"包括性 (Inclusiveness)",def:"AI システムはあらゆる人に力を与え、人々を結びつける必要があるという原則。アクセシビリティを含む。"},
+{id:"c1-15",ch:1,term:"透明性 (Transparency)",def:"AI システムは理解しやすい必要があるという原則。説明可能な AI (XAI) や制限事項の明示が含まれる。"},
+{id:"c1-16",ch:1,term:"説明可能な AI (XAI)",def:"AI が出力した結論や判断の根拠を人間が理解し、信頼できるようにするための技術。"},
+{id:"c1-17",ch:1,term:"アカウンタビリティ (Accountability)",def:"AI システムの挙動に対しての説明責任を明確にする必要があるという原則。人間による上書きの仕組みなどが含まれる。"},
+{id:"c1-18",ch:1,term:"コンテンツ フィルタリング ガードレール",def:"Microsoft Foundry のガードレール機能。悪用される可能性のある有害情報を「高・中・低・安全」の4段階でフィルタリングする。"},
+// --- 第2章 生成AIとエージェントの概要 ---
+{id:"c2-01",ch:2,term:"大規模言語モデル (LLM)",def:"大量のテキストデータを事前学習し、文脈に基づいて次に来る単語を予測することで文章を生成する AI モデル。"},
+{id:"c2-02",ch:2,term:"小規模言語モデル (SLM)",def:"フォーカスされたテキストデータで学習し、パラメーターが少なく高速・ポータブルで、微調整も高速・低コストなモデル。"},
+{id:"c2-03",ch:2,term:"トランスフォーマーモデル",def:"自然言語処理におけるニューラルネットワークアーキテクチャの一つ。エンコーダーとデコーダーで構成され、自己注意機構により文脈を効果的に捉える。"},
+{id:"c2-04",ch:2,term:"自己注意機構 (Self-Attention)",def:"入力シーケンス内の各単語が他のすべての単語に注意を払うことで、長い文章でも文脈情報を効果的に捉える仕組み。"},
+{id:"c2-05",ch:2,term:"トークン化",def:"AI が意味を処理しやすいように、文章を単語・語の一部・記号などの最小単位に分割すること。"},
+{id:"c2-06",ch:2,term:"埋め込み (Embedding)",def:"トークンをそのまま扱わず、意味を持った数値のリスト (ベクトル) に変換すること。似た意味の単語は近い場所に配置される。"},
+{id:"c2-07",ch:2,term:"位置エンコーディング (Positional Encoding)",def:"初期ベクトルに「何番目の単語か」という位置情報を計算して加算する処理。"},
+{id:"c2-08",ch:2,term:"エンコーダー / デコーダー",def:"トランスフォーマーの2つの主要部分。エンコーダーは意味的な表現を作成し、デコーダーは新しい言語シーケンスを生成する。"},
+{id:"c2-09",ch:2,term:"システムプロンプト (手順)",def:"モデルの動作とトーン、およびそれに準拠する必要がある制約を設定する指示のこと。"},
+{id:"c2-10",ch:2,term:"プロンプトエンジニアリング",def:"生成 AI から望ましい出力を得るために、言語モデルへの命令方法 (プロンプト) を最適化する手法。"},
+{id:"c2-11",ch:2,term:"検索拡張生成 (RAG)",def:"モデルのトレーニングや微調整をすることなく、GPT などの AI モデルを独自データ用にカスタマイズできる手法。社内データなどをグラウンディングに用いる。"},
+{id:"c2-12",ch:2,term:"微調整 (ファインチューニング)",def:"すでに学習済みのモデルに新たな層を追加し、独自のトレーニングデータでモデルの再トレーニングを行うこと。"},
+{id:"c2-13",ch:2,term:"Microsoft Foundry",def:"AI アプリケーションとエージェントを構築・デプロイ・管理するためのサービスとしてのプラットフォーム (PaaS)。"},
+{id:"c2-14",ch:2,term:"モデルカタログ",def:"広範なプロバイダーから幅広い選択の生成 AI モデルを検出・比較・デプロイするための中心的なハブ。"},
+{id:"c2-15",ch:2,term:"AI エージェント",def:"生成 AI モデルを使用して構築されたアプリケーションのこと。モデル・手順・ツール(ナレッジ、アクション)で構成される。"},
+{id:"c2-16",ch:2,term:"MCP (Model Context Protocol)",def:"AI エージェントと外部ツール・データをつなぐための共通プロトコル。データ取得やアクション実行の個別実装を減らし再利用性を高める。"},
+{id:"c2-17",ch:2,term:"Azure サブスクリプション",def:"Azure の使用に必要な、管理・課金・スケールの単位。"},
+{id:"c2-18",ch:2,term:"リソースグループ",def:"Azure リソースを階層に整理して管理する仕組み。ポリシーやアクセス権限管理、ロックなどが行える。"},
+{id:"c2-19",ch:2,term:"エンドポイント",def:"アプリやサービスが外部とデータを送受信するために公開している、アクセス用の URL や接続先のこと。キーで認証してアクセスする。"},
+// --- 第3章 自然言語処理 ---
+{id:"c3-01",ch:3,term:"自然言語処理 (NLP)",def:"人間の言語を機械で処理し、内容を抽出すること。言葉の「あいまいさ」や「意味の重複」を場面に応じて処理する。"},
+{id:"c3-02",ch:3,term:"テキスト正規化",def:"句読点の削除やすべての単語を小文字に変換するなど、テキストを前処理すること。"},
+{id:"c3-03",ch:3,term:"ストップワードの削除",def:"「the」「は」「に」など、セマンティック上の意味がほぼない単語を除外する前処理。"},
+{id:"c3-04",ch:3,term:"ステミング",def:"単語の末尾をルールに基づいて機械的に切り落とし、語幹 (stem) を抽出するプロセス。例: connected → connect"},
+{id:"c3-05",ch:3,term:"レンマ化 (レンマチゼーション)",def:"単語をその辞書に載っている基本形 (lemma) に変換するプロセス。例: running → run"},
+{id:"c3-06",ch:3,term:"n-gram",def:"「私たち は」「は 月」のように、複数の単語をグループとして考慮する手法。"},
+{id:"c3-07",ch:3,term:"品詞 (POS) のタグ付け",def:"名詞・動詞・形容詞など、文法的役割を示す品詞ラベルを単語に付与するプロセス。"},
+{id:"c3-08",ch:3,term:"TF-IDF (単語の出現頻度 - 逆文書頻度)",def:"よく出るが他の文書でも多い単語の重要度を下げ、その文書らしい単語を強調する統計的テキスト分析手法。"},
+{id:"c3-09",ch:3,term:"Bag-of-Words (BoW)",def:"単語の出現回数をベクトル化する機械学習手法。単語の順序や意味は考慮しない。"},
+{id:"c3-10",ch:3,term:"TextRank",def:"単語や文の関係性から重要度を算出する手法。抽出型の要約によく使われる。"},
+{id:"c3-11",ch:3,term:"セマンティック言語モデル (埋め込み)",def:"単語や文を「意味」を持つベクトルとして表現する手法。意味が近い表現は近いベクトルになり、文脈も考慮できる。"},
+{id:"c3-12",ch:3,term:"名前付きエンティティ認識 (NER)",def:"人名・地名・組織名などの固有名詞をテキストから抽出すること。カスタムカテゴリにも対応可能。"},
+{id:"c3-13",ch:3,term:"エンティティリンク",def:"抽出したエンティティを Wikipedia などの既知のリソースに関連付けること。"},
+{id:"c3-14",ch:3,term:"キーフレーズ抽出",def:"テキスト内の重要な概念やキーワードを抽出すること。"},
+{id:"c3-15",ch:3,term:"要約 (Summarization)",def:"長文テキストから重要な要点を抽出して短縮化すること。"},
+{id:"c3-16",ch:3,term:"感情分析 & オピニオンマイニング",def:"肯定的・否定的・中立的な感情を判別し、主語や対象への意見も抽出すること。"},
+{id:"c3-17",ch:3,term:"言語検出",def:"入力テキストの言語を判別し、言語コードを返すこと。"},
+{id:"c3-18",ch:3,term:"個人識別情報 (PII) 検出",def:"電話番号・住所・健康情報 (PHI) などの機密データを識別すること。マスキング処理などに利用される。"},
+{id:"c3-19",ch:3,term:"Azure Language サービス",def:"Microsoft Foundry の言語プレイグラウンドで実行できる、テキスト分析・カスタム質問応答・会話言語理解などを含むサービス群。"},
+// --- 第4章 AI 音声 ---
+{id:"c4-01",ch:4,term:"音声認識 (Speech to Text)",def:"音声をテキストに変換すること。ファイル・ストリーム・マイクからの音声入力に対応する。"},
+{id:"c4-02",ch:4,term:"音声合成 (Text to Speech)",def:"テキストを自然な音声 (音声波形) に変換すること。"},
+{id:"c4-03",ch:4,term:"音素 (Phoneme)",def:"音声における最小の音の単位。音響モデリングで特徴を音素にマッピングする。"},
+{id:"c4-04",ch:4,term:"音響モデリング",def:"音声認識のプロセスの一つ。抽出した音声の特徴を音素にマッピングする処理。"},
+{id:"c4-05",ch:4,term:"韻律 (プロソディ)",def:"ピッチや音色など、自然な発音と話し方のリズムを明確にする要素。音声合成の重要な段階の一つ。"},
+{id:"c4-06",ch:4,term:"Azure Speech",def:"Microsoft Foundry Tools で利用できる AI 音声サービス。音声テキスト変換・テキスト読み上げ・音声翻訳などを含む。"},
+{id:"c4-07",ch:4,term:"Azure Voice Live",def:"リアルタイム接続を開いて音声をストリーミングし、音声応答や割り込みを処理する、リアルタイム音声のためのサービス。"},
+// --- 第5章 コンピュータービジョン ---
+{id:"c5-01",ch:5,term:"コンピュータービジョン (Computer Vision)",def:"コンピューターとシステムが画像・動画・視覚データから意味のある情報を導き出す人工知能の総称。ピクセルの操作と分析に基づく。"},
+{id:"c5-02",ch:5,term:"画像の分類",def:"画像に何が写っているのかを検出するタスク。"},
+{id:"c5-03",ch:5,term:"オブジェクトの検出",def:"画像のどこに何が写っているのかを、バウンディングボックスなどで検出するタスク。"},
+{id:"c5-04",ch:5,term:"セマンティックセグメンテーション",def:"画像内のすべてのピクセル単位で、どこに何が写っているのかを検出するタスク。"},
+{id:"c5-05",ch:5,term:"コンテキスト画像分析 (画像キャプション)",def:"画像を分析して、その内容を説明文で表現するタスク。"},
+{id:"c5-06",ch:5,term:"畳み込みニューラルネットワーク (CNN)",def:"画像処理に優れたニューラルネットワーク。フィルターを使用して画像から数値的な「特徴」を抽出する。"},
+{id:"c5-07",ch:5,term:"移動不変性",def:"CNN のフィルター処理が持つ性質。物体が画像のどの位置に写っていても特徴を抽出しやすい。"},
+{id:"c5-08",ch:5,term:"マルチモーダルモデル",def:"テキスト・画像・音声など複数の種類のデータを一度に処理できる AI のこと。"},
+{id:"c5-09",ch:5,term:"ビジョントランスフォーマー (ViT)",def:"画像をパッチ (小領域) に分割してトークンとして扱い、トランスフォーマー構造で画像認識を行うモデル。"},
+{id:"c5-10",ch:5,term:"拡散モデル (Diffusion Model)",def:"データに「ノイズを加えていく過程」とその「ノイズを取り除いていく過程」を学習する、画像生成 AI の核となる生成モデル。"},
+// --- 第6章 情報抽出 ---
+{id:"c6-01",ch:6,term:"AI 情報抽出",def:"請求書・契約書・名刺・音声・画像などのデジタルコンテンツを分析し、有用な構造化データに変換するワークロード。"},
+{id:"c6-02",ch:6,term:"光学文字認識 (OCR)",def:"画像や紙の文書に写った文字をコンピューターが読み取り、デジタルな文字データへ変換する技術。"},
+{id:"c6-03",ch:6,term:"OCR パイプライン",def:"画像の取得と入力 → 前処理とイメージの強化 → テキスト領域の検出 → 文字認識と分類 → 出力生成と後処理、の5ステップで構成される処理の流れ。"},
+{id:"c6-04",ch:6,term:"Azure Content Understanding",def:"構造化ドキュメント・画像・オーディオ・ビデオから分析情報を抽出できる、生成型 AI ベースのマルチモーダル分析サービス。"},
+{id:"c6-05",ch:6,term:"スキーマ",def:"Content Understanding で、抽出したいフィールドと構造を定義するもの。"},
+{id:"c6-06",ch:6,term:"アナライザー",def:"スキーマに基づいてコンテンツを分析し、構造化された JSON 結果を返す Content Understanding の機能。"}
+];
+
+/* ============================================================
+   QUIZ DATA (49 questions) — o: options, c: correct index, e: explanation
+   ============================================================ */
+var QUIZ = [
+// 第1章
+{id:"q1-01",ch:1,q:"予測アプリでは、視覚障碍者向けのオーディオ出力が提供されます。ここに反映されている責任あるAIの原則はどれですか?",o:["透明性","包括性","公平性"],c:1,e:"あらゆる利用者がシステムにアクセスでき利用しやすくすることは「包括性 (Inclusiveness)」の原則にあたります。視覚障碍者への音声出力はアクセシビリティの一例です。"},
+{id:"q1-02",ch:1,q:"人工知能ということばが初めて提唱されたとされる会議は次のうちどれですか?",o:["ダートマス会議","チューリング会議","シンギュラリティサミット"],c:0,e:"1956年のダートマス会議で、主催者のジョン・マッカーシー氏が「人工知能 (Artificial Intelligence)」という言葉を提唱したことが起源とされています。"},
+{id:"q1-03",ch:1,q:"生成AIが事実に基づかない情報をあたかも真実であるかのように出力する現象を何と呼びますか?",o:["オーバーフィッティング","ハルシネーション","バイアス"],c:1,e:"生成AIが文脈と無関係な内容や事実に基づかない内容を、事実であるかのように出力する現象を「ハルシネーション (Hallucination)」と呼びます。"},
+{id:"q1-04",ch:1,q:"Microsoftの責任あるAIの6つの基本原則に含まれないものはどれですか?",o:["透明性","収益性","包括性"],c:1,e:"6原則は、公平性・信頼性と安全性・プライバシーとセキュリティ・包括性・透明性・アカウンタビリティです。「収益性」は含まれません。"},
+{id:"q1-05",ch:1,q:"「システムに異常が発生した場合でも、安全な側に動作させることで人命などに危険が及ばないようにする設計」を何と呼びますか?",o:["フェイルセーフ","グラウンディング","ファインチューニング"],c:0,e:"これは「信頼性と安全性」の原則に含まれる「フェイルセーフ」の説明です。"},
+{id:"q1-06",ch:1,q:"次のうち、本文で挙げられている人工知能ワークロードの5分野に含まれないものはどれですか?",o:["コンピュータービジョン","情報抽出","データベース正規化"],c:2,e:"5分野は、生成AIとエージェント・テキストと言語・AI音声・コンピュータービジョン・情報抽出です。データベース正規化はAIワークロードではありません。"},
+{id:"q1-07",ch:1,q:"ディープラーニング (深層学習) の説明として最も適切なものはどれですか?",o:["人の神経回路を模したニューラルネットワークを幾重にも重ね、精度の高い機械学習を実現する手法","単語の出現回数を数えて文書の主要トピックを把握する統計的手法","既存のモデルに新しい層を追加し独自データで再学習を行う手法"],c:0,e:"ディープラーニングは、ニューラルネットワークを幾重にも重ねることで精度の高い機械学習を実現する手法のひとつです。2番目はBoW、3番目は微調整の説明です。"},
+// 第2章
+{id:"q2-01",ch:2,q:"大規模言語モデルとは何ですか?",o:["人間のようなテキストを生成するために設計されたAIモデルの一種です。","画像のみを処理し、テキストは処理しないモデルです。","モバイルデバイス向けの小さく効率的なモデルです。"],c:0,e:"大規模言語モデル (LLM) は大量のテキストデータを学習し、人間のような自然なテキストを生成するAIモデルです。"},
+{id:"q2-02",ch:2,q:"埋め込みとは何ですか?",o:["トランスフォーマーモデルによる追加語でテキスト生成を強化します","特定のタスクに使われる小規模言語モデル","トークンの意味的意味を捉えるベクトルベースの表現"],c:2,e:"埋め込み (Embedding) は、トークンを意味を持つ数値ベクトルに変換する表現方法です。"},
+{id:"q2-03",ch:2,q:"トランスフォーマーモデルにおける注意層は何をするのでしょうか?",o:["入力テキストから無関係な単語を削除します。","各トークンとその周囲のトークンとの関係性を検証します","生成されたテキストに不適切な内容を指摘します"],c:1,e:"自己注意機構 (Self-Attention) は、各トークンが他のすべてのトークンとの関係性を計算し、文脈情報を効果的に捉える仕組みです。"},
+{id:"q2-04",ch:2,q:"生成AIに関する最も正確な説明はどれですか?",o:["生成AIは言語モデルを使用して、プロンプトに応じて独自のコンテンツを作成します。","生成AIは、機械学習に取って代わられた古い形式のAIです。","生成AIは、データサイエンティストなどの専門家だけが使用できる複雑な形式のAIです。"],c:0,e:"生成AIは自然言語のプロンプトに基づいて独自のコンテンツ (テキスト・画像・コードなど) を作成できるAIです。"},
+{id:"q2-05",ch:2,q:"Azureベースの AIアプリケーションでキー、シークレット、エンドポイントがどのように連携するかを最もよく説明している記述はどれですか。",o:["キーはモデル応答が保存される場所であり、エンドポイントはAzure Key Vaultからそれらの応答を取得します。","エンドポイントにはAIアプリケーションの機密値が保存され、キーによってエンドポイントが返すことができるデータの量が決まります。","エンドポイントはデプロイされたモデルを呼び出すためのURLであり、キーはそのエンドポイントへのリクエストを認証します。"],c:2,e:"エンドポイントはモデルを呼び出すための公開URL、キーはそのリクエストを認証するための資格情報です。"},
+{id:"q2-06",ch:2,q:"Microsoft Foundry モデルカタログの目的を最もよく説明しているのは、次のうちどれですか?",o:["Copilot Studio プロジェクトのユーザー生成コンテンツを格納します。","ユーザーはサブスクリプション内のすべての Azure サービスのコストを比較できます。","複数のプロバイダーの生成AIモデルを検出、比較、デプロイするための一元化されたハブです。"],c:2,e:"モデルカタログは、幅広いプロバイダーの生成AIモデルを検出・比較・デプロイするための中心的なハブです。"},
+{id:"q2-07",ch:2,q:"小規模言語モデル (SLM) の特徴として正しいものはどれですか?",o:["パラメーターが少なく高速でポータブルで、特定タスクへの微調整が容易","何十億ものパラメーターを持ち汎用性が非常に高い","画像生成専用に設計されたモデルである"],c:0,e:"SLMはフォーカスされたデータで学習され、パラメーターが少なく高速・ポータブル、独自データでの微調整も高速・低コストです。"},
+{id:"q2-08",ch:2,q:"検索拡張生成 (RAG) の主な利点は何ですか?",o:["モデルの再学習や微調整をせずに独自データに基づいた回答を生成できる","モデルのパラメーター数を削減し軽量化できる","音声をテキストに変換する速度が向上する"],c:0,e:"RAGはモデルのトレーニングや微調整をすることなく、独自データ (社内文書など) をグラウンディングとして活用し、回答をカスタマイズできる手法です。"},
+{id:"q2-09",ch:2,q:"AIエージェントを構成する要素として本文中で挙げられていないものはどれですか?",o:["モデル","手順","データベーススキーマ"],c:2,e:"AIエージェントは、モデル・手順 (システムプロンプト)・ツール (ナレッジ、アクション) で構成されます。データベーススキーマは構成要素として挙げられていません。"},
+{id:"q2-10",ch:2,q:"MCP (Model Context Protocol) の目的として最も適切なものはどれですか?",o:["AIエージェントと外部ツール・データをつなぐための共通プロトコルを提供すること","生成AIモデルのパラメーター数を圧縮すること","Azureサブスクリプションの課金体系を管理すること"],c:0,e:"MCPは、AIエージェントが外部のツールやデータと連携するための共通プロトコルであり、個別実装を減らし再利用性を高めます。"},
+// 第3章
+{id:"q3-01",ch:3,q:"自然言語モデル (NLP) でのトークン化の主な目的は何ですか?",o:["テキストを別の言語に翻訳するため","大量のドキュメントを要約するため","テキストを分析用により小さな単位に分割するため"],c:2,e:"トークン化は、テキスト内の個々の単語や記号をトークンという最小単位に置き換え、分析しやすくする処理です。"},
+{id:"q3-02",ch:3,q:"自然言語処理 (NLP) における埋め込み表現の役割を最もよく説明しているのは次のうちどれですか?",o:["テキストデータを2次元空間で視覚化して、解釈を容易にする。","大きなテキストコーパスを短く意味のある文にまとめる。","言語トークンを意味関係をキャプチャするベクトルに変換する。"],c:2,e:"埋め込み表現は、単語や文をその意味的な関係性を捉えたベクトルとして表現する手法です。"},
+{id:"q3-03",ch:3,q:"Foundry Tools の Azure Language サービスを使用して、テキストドキュメントの主要な要点を決定する必要があります。サービスのどの機能を使用する必要がありますか?",o:["感情分析","キーフレーズ抽出","エンティティ検出"],c:1,e:"テキスト内の重要な概念やキーワードを抽出するのは「キーフレーズ抽出」の役割です。"},
+{id:"q3-04",ch:3,q:"Foundry Tools の Azure Language サービスに含まれる機能にはどのようなものがありますか?",o:["翻訳とボットのデプロイ","音声認識","テキスト分析、カスタム質問応答、会話言語理解"],c:2,e:"Azure Language サービスには、テキスト分析・カスタム質問応答・会話言語理解などの機能が含まれます。"},
+{id:"q3-05",ch:3,q:"Azure Language MCP サーバーの主な目的は何ですか?",o:["エージェントのために自動的にウェブサイトのレイアウトを生成するために。","エージェント内のすべての生成AIモデルを置き換えること。","Model Context Protocol を通じて Azure Language の機能をエージェントに公開すること"],c:2,e:"Azure Language MCPサーバーは、MCPを通じてAzure Languageの感情分析やキーフレーズ抽出などの機能をエージェントから利用可能にします。"},
+{id:"q3-06",ch:3,q:"ステミングの説明として正しいものはどれですか?",o:["単語をその辞書に載っている基本形に変換するプロセス","単語の末尾をルールに基づいて機械的に切り落とし語幹を抽出するプロセス","文法的役割を示す品詞ラベルを単語に付与するプロセス"],c:1,e:"ステミングは単語の末尾を機械的に切り落として語幹 (stem) を抽出する処理です (例: connected → connect)。1番目はレンマ化、3番目は品詞タグ付けの説明です。"},
+{id:"q3-07",ch:3,q:"TF-IDF が重視する単語とはどのようなものですか?",o:["すべての文書に均等に出現する単語","特定の文書によく出現するが他の文書にはあまり出現しない単語","ストップワードとして除外される単語"],c:1,e:"TF-IDFは、他の文書でも多く出る単語の重要度を下げ、その文書らしい (特徴的な) 単語の重要度を高める統計手法です。"},
+{id:"q3-08",ch:3,q:"PII検出によって識別される情報として適切なものはどれですか?",o:["電話番号やメールアドレスなどの個人を特定できる情報","文章の感情的なトーン","文書内のキーフレーズ"],c:0,e:"PII (個人識別情報) 検出は、電話番号・住所・メールアドレスなど個人を特定できる情報を識別する機能です。"},
+// 第4章
+{id:"q4-01",ch:4,q:"音声認識の前処理段階でどのような活動が起こるのでしょうか?",o:["音声は.wmvフォーマットに変換されます。","音声信号に背景ノイズが加わります。","特徴ベクトルはモデリングのために音声波形から抽出されます。"],c:2,e:"前処理と特徴づけの段階では、特定の周波数における信号強度を特徴ベクトルとして音声波形から抽出します。"},
+{id:"q4-02",ch:4,q:"音素とは何ですか?",o:["クリーンアップの過程で信号から除去されるアーティファクト","音声における最小の音の単位","音声を生成するAIモデル"],c:1,e:"音素 (Phoneme) は音声における最小の音の単位で、音響モデリングで特徴とマッピングされます。"},
+{id:"q4-03",ch:4,q:"なぜ音声合成で韻律を生成することが重要なのでしょうか?",o:["プロソディは音声出力の音量を最大化します。","韻律は話し言葉を聞き手の言語に翻訳します。","韻律は自然な発音と話し方のリズムを保証します。"],c:2,e:"韻律 (プロソディ) はピッチや音色など、自然な発音と話し方のリズムを明確にする要素です。"},
+{id:"q4-04",ch:4,q:"Azure のText-to-Speech SDK は開発者向けに何を扱うのでしょうか?",o:["音声を選択し、手動で音声ファイルを書き込むだけです","認証、ネットワーク通信、オーディオ生成","合成音声をAzure Storageに永久保存する方法"],c:1,e:"Text-to-Speech SDKは、キーやエンドポイントによる認証、サービスとのネットワーク通信、音声波形の生成までを扱います。"},
+{id:"q4-05",ch:4,q:"Voice Live Python SDK (azure-ai-voicelive) は音声対応エージェントでどのような役割を果たしていますか?",o:["音声録音をAzure Storageに永久保存します","ユーザーのデバイスにマイクやスピーカーを置く必要性を置き換えます","リアルタイム接続を開き、音声をストリーミングし、音声応答や中断を処理します"],c:2,e:"Voice Live SDKはリアルタイム接続を確立し、音声のストリーミング、応答生成、割り込み処理などを担います。"},
+{id:"q4-06",ch:4,q:"音声認識 (Speech to Text) の一般的なユースケースとして本文中に挙げられていないものはどれですか?",o:["カスタマーサービスとサポート","会議とインタビューの書き起こし","テキストから画像の生成"],c:2,e:"音声認識のユースケースにはカスタマーサービス、会議の書き起こし、音声ノート取りなどがあります。画像生成は音声認識とは無関係です。"},
+{id:"q4-07",ch:4,q:"音声合成のプロセスにおいて「正規化されたテキストを音素にマッピングする」段階を何と呼びますか?",o:["波形符号化","音声 / 発音モデリング","正規化"],c:1,e:"音声/発音モデリングの段階で、正規化されたテキストを音素 (単語の音) にマッピングします。"},
+{id:"q4-08",ch:4,q:"Azure Voice Live が実現するものは何ですか?",o:["リアルタイム音声を使用した対話","音声ファイルの永久保存","テキストの多言語翻訳"],c:0,e:"Azure Voice Liveは、生成AIモデルのエージェントで音声モデルをオンにすることでリアルタイム音声のやり取りを実現します。"},
+// 第5章
+{id:"q5-01",ch:5,q:"コンピュータービジョンは、画像内のどのような種類の値の操作と分析に基づいていますか?",o:["写真メタデータのタイムスタンプ","ピクセル","画像ファイル名"],c:1,e:"コンピュータービジョンは、画像を構成するピクセルの値を操作・分析することに基づいています。"},
+{id:"q5-02",ch:5,q:"画像分類に使用される畳み込みニューラルネットワーク (CNN) におけるフィルターの主な役割は何ですか?",o:["視覚効果を適用して画像の外観を充実させる。","ニューラルネットワークで使用するために画像から数値的特徴を抽出する。","処理を高速化するために画像サイズを圧縮する。"],c:1,e:"CNNのフィルターは、画像から数値的な「特徴」を抽出し、ニューラルネットワークでの分類に利用します。"},
+{id:"q5-03",ch:5,q:"ビジョントランスフォーマー (ViT) に最も適した説明はどれですか?",o:["画像にフィルターを適用し、外観を変更するツール。","大規模な言語モデルをビジョンモデルに変換するAIエージェント。","注意を使用して画像パッチを処理し、コンテキスト埋め込みを作成するモデル。"],c:2,e:"ViTは画像をパッチに分割してトークンとして扱い、注意機構を使ってコンテキストを反映した埋め込みを作成するモデルです。"},
+{id:"q5-04",ch:5,q:"マルチモーダルモデルとは何ですか?",o:["テキストではなく画像のみを処理できるモデル","テキストや画像など、複数の種類のデータを理解し操作できるモデル","ビデオコンテンツのみを生成するモデル"],c:1,e:"マルチモーダルモデルは、テキスト・画像・音声など複数の種類のデータを一度に処理できるAIです。"},
+{id:"q5-05",ch:5,q:"開発者がFoundry画像生成モデルを使用して画像をプログラムで生成するにはどうすればよいですか?",o:["デプロイした画像モデルを使用してOpenAI Responses APIを介してテキストプロンプトを送信する","Foundry Playground UIを使用して画像をアップロードする","GPT-4.1モデルエンドポイントを呼び出す"],c:0,e:"デプロイした画像生成モデル (GPT-Imageシリーズなど) にOpenAI Responses APIを介してテキストプロンプトを送信することでプログラムから画像を生成できます。"},
+{id:"q5-06",ch:5,q:"Microsoft FoundryでSoraモデルを使用したビデオ生成が非同期ジョブとして処理されるのはなぜですか?",o:["ビデオ生成ではレンダリング中にユーザーの操作が必要になるから","REST APIでは同期要求をサポートしていないから","ビデオ生成はリソースを大量に消費し、完了までに時間がかかるから"],c:2,e:"ビデオ生成は計算リソースを大量に消費し完了までに時間がかかるため、非同期ジョブとして処理されます。"},
+{id:"q5-07",ch:5,q:"画像内のすべてのピクセル単位でどこに何が写っているかを検出するタスクを何と呼びますか?",o:["オブジェクトの検出","セマンティックセグメンテーション","画像の分類"],c:1,e:"セマンティックセグメンテーションは、画像内のすべてのピクセル単位でどこに何が写っているかを検出するタスクです。"},
+{id:"q5-08",ch:5,q:"拡散モデル (Diffusion Model) の仕組みとして正しいものはどれですか?",o:["データにノイズを加える過程とノイズを取り除く過程を学習し、ノイズ除去を逆に行うことで画像を生成する","単語の出現頻度をベクトル化して文書の類似度を測る","音声波形をテキストに変換する統計モデル"],c:0,e:"拡散モデルは、画像にノイズを加える過程とそれを取り除く過程を学習し、ランダムなノイズから逆に画像を生成します。"},
+{id:"q5-09",ch:5,q:"CNN (畳み込みニューラルネットワーク) が持つ「物体が画像のどの位置にあっても特徴を抽出しやすい」性質を何と呼びますか?",o:["移動不変性","位置エンコーディング","自己注意機構"],c:0,e:"移動不変性は、局所的な特徴を走査するフィルター処理により、物体が画像のどこにあっても特徴を抽出しやすい性質です。"},
+// 第6章
+{id:"q6-01",ch:6,q:"AI情報抽出を正確に定義する次の記述のうちどれですか?",o:["SQLコードを使用してデータベースをクエリします。","クラウドストレージからローカルディスクにファイルをコピーします。","非構造化コンテンツを分析して、関連するフィールドと値を識別して抽出します。"],c:2,e:"AI情報抽出は、請求書や契約書などの非構造化コンテンツを分析し、関連するフィールドと値を識別・抽出して構造化データに変換します。"},
+{id:"q6-02",ch:6,q:"生成AIはデータ抽出プロセスをどのように強化するのでしょうか?",o:["セマンティック言語モデルを使用して、抽出された値をデータフィールドに正確に一致させます。","各ドキュメントタイプごとに抽出ルールを手動でコーディングします。","新しいドキュメントを最初から生成します。"],c:0,e:"生成AIはセマンティック言語モデルを活用し、フィールドの検出やマッピングを柔軟かつ高精度に行えるようにします。"},
+{id:"q6-03",ch:6,q:"基本的なOCRではなくAzure Content Understandingを使用する主な利点は何ですか?",o:["Azure Content Understandingは、画像の前処理をスキップすることでテキストをより速く抽出します。","Azure Content Understandingはドキュメント構造を理解し、抽出されたデータを定義済みのスキーマにマッピングします。","Azure Content Understandingは構造化データを抽出し、OCRはテキスト内の単語間の関係を抽出します。"],c:1,e:"Azure Content Understandingは、単なる文字認識にとどまらずドキュメント構造を理解し、定義済みのスキーマに沿って構造化データへマッピングします。"},
+{id:"q6-04",ch:6,q:"Azure Content Understandingにおけるアナライザーの主な役割は何ですか?",o:["コンテンツがどのように処理され、どのような構造化データが返されるかを定義します。","抽出したデータをデータベースに保存します。","JSON出力を人間が読めるテキストに変換します。"],c:0,e:"アナライザーは、スキーマに基づきコンテンツがどのように処理され、どのような構造化データを返すかを定義する機能です。"},
+{id:"q6-05",ch:6,q:"OCR (光学文字認識) の説明として最も適切なものはどれですか?",o:["画像や紙の文書に写った文字をコンピューターが読み取り、デジタルな文字データへ変換する技術","音声をリアルタイムで別の言語に翻訳する技術","画像の中の物体をピクセル単位で分類する技術"],c:0,e:"OCRは画像や紙文書の文字を読み取り、デジタルな文字データに変換する技術です。"},
+{id:"q6-06",ch:6,q:"Azure Content Understandingにおいて、抽出したいフィールドと構造を定義するものを何と呼びますか?",o:["エンドポイント","スキーマ","トークン"],c:1,e:"スキーマは、Content Understandingで抽出したいフィールドと構造をあらかじめ定義するものです。"},
+{id:"q6-07",ch:6,q:"OCRパイプラインの一般的な処理順序として正しいものはどれですか?",o:["画像の取得と入力 → 前処理とイメージの強化 → テキスト領域の検出 → 文字認識と分類 → 出力生成と後処理","出力生成と後処理 → 文字認識と分類 → 画像の取得と入力","テキスト領域の検出 → 画像の取得と入力 → 出力生成と後処理"],c:0,e:"OCRパイプラインは、画像取得 → 前処理 → テキスト領域検出 → 文字認識 → 出力生成の順に進みます。"}
+];
+
+/* ============================================================
+   STORAGE
+   ============================================================ */
+var STORE_KEY = "ai901_study_progress_v1";
+function loadState(){
+  try{
+    var raw = localStorage.getItem(STORE_KEY);
+    if(raw) return JSON.parse(raw);
+  }catch(e){}
+  return {cards:{}, quizHistory:{}, examHistory:[]};
+}
+function saveState(){
+  try{ localStorage.setItem(STORE_KEY, JSON.stringify(state)); }catch(e){}
+}
+var state = loadState();
+if(!state.cards) state.cards = {};
+if(!state.quizHistory) state.quizHistory = {};
+if(!state.examHistory) state.examHistory = [];
+
+function chapterInfo(id){ for(var i=0;i<CHAPTERS.length;i++){ if(CHAPTERS[i].id===id) return CHAPTERS[i]; } return CHAPTERS[0]; }
+function cardsOf(ch){ return ch ? FLASHCARDS.filter(function(c){return c.ch===ch;}) : FLASHCARDS.slice(); }
+function quizOf(ch){ return ch ? QUIZ.filter(function(q){return q.ch===ch;}) : QUIZ.slice(); }
+function shuffle(arr){
+  var a = arr.slice();
+  for(var i=a.length-1;i>0;i--){
+    var j = Math.floor(Math.random()*(i+1));
+    var t=a[i]; a[i]=a[j]; a[j]=t;
+  }
+  return a;
+}
+function pct(n,d){ return d ? Math.round((n/d)*100) : 0; }
+
+/* ============================================================
+   NAV RENDER
+   ============================================================ */
+var currentView = "home";
+function renderNav(){
+  var desktop = document.getElementById("nav-desktop");
+  var mobile = document.getElementById("nav-mobile");
+  desktop.innerHTML = ""; mobile.innerHTML = "";
+  NAV.forEach(function(item){
+    [desktop, mobile].forEach(function(container){
+      var b = document.createElement("button");
+      b.className = "nav-item" + (currentView===item.id ? " active" : "");
+      b.innerHTML = '<svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">'+item.icon+'</svg><span>'+item.label+'</span>';
+      b.addEventListener("click", function(){ goTo(item.id); });
+      container.appendChild(b);
+    });
+  });
+}
+function goTo(view){
+  currentView = view;
+  ["home","flash","quiz","exam","glossary"].forEach(function(v){
+    document.getElementById("view-"+v).hidden = (v!==view);
+  });
+  renderNav();
+  if(view==="home") renderHome();
+  if(view==="flash") renderFlashSetup();
+  if(view==="quiz") renderQuizSetup();
+  if(view==="exam") renderExamSetup();
+  if(view==="glossary") renderGlossary();
+  window.scrollTo({top:0,behavior:"instant"});
+}
+
+/* ============================================================
+   HOME
+   ============================================================ */
+function overallStats(){
+  var totalCards = FLASHCARDS.length;
+  var masteredCount = 0;
+  Object.keys(state.cards).forEach(function(k){ if(state.cards[k]==="mastered") masteredCount++; });
+
+  var quizPcts = [];
+  Object.keys(state.quizHistory).forEach(function(k){ quizPcts.push(state.quizHistory[k].best); });
+  var avgQuiz = quizPcts.length ? Math.round(quizPcts.reduce(function(a,b){return a+b;},0)/quizPcts.length) : null;
+
+  var examBest = state.examHistory.length ? Math.max.apply(null, state.examHistory.map(function(e){return e.pct;})) : null;
+
+  return {totalCards:totalCards, masteredCount:masteredCount, avgQuiz:avgQuiz, examBest:examBest};
+}
+function renderHome(){
+  var greetEl = document.getElementById("home-greeting");
+  greetEl.textContent = "Yoshiさん、学習を始めましょう";
+
+  var s = overallStats();
+  document.getElementById("stat-mastered").textContent = s.masteredCount;
+  document.getElementById("stat-total-cards").textContent = s.totalCards;
+  document.getElementById("stat-best-quiz").textContent = s.avgQuiz===null ? "–" : s.avgQuiz+"%";
+  document.getElementById("stat-exam-best").textContent = s.examBest===null ? "–" : s.examBest+"%";
+
+  var grid = document.getElementById("chapter-grid");
+  grid.innerHTML = "";
+  CHAPTERS.forEach(function(ch){
+    var cards = cardsOf(ch.id);
+    var mastered = cards.filter(function(c){ return state.cards[c.id]==="mastered"; }).length;
+    var qCount = quizOf(ch.id).length;
+    var p = pct(mastered, cards.length);
+
+    var card = document.createElement("button");
+    card.className = "chapter-card";
+    card.style.setProperty("--ch-color", ch.color);
+    card.innerHTML =
+      '<div class="ch-top"><span class="ch-num">第'+ch.id+'章</span></div>'+
+      '<h3>'+ch.title+'</h3>'+
+      '<div class="progress-track"><div class="progress-fill" style="width:'+p+'%"></div></div>'+
+      '<div class="ch-meta"><span>'+cards.length+' 用語 &middot; '+qCount+' 問</span><span class="mono">'+p+'%</span></div>';
+    card.addEventListener("click", function(){
+      flashState.chapter = ch.id;
+      goTo("flash");
+    });
+    grid.appendChild(card);
+  });
+}
+
+/* ============================================================
+   FLASHCARDS
+   ============================================================ */
+var flashState = {chapter:0, deck:[], index:0, flipped:false};
+
+function renderFlashSetup(){
+  var pillRow = document.getElementById("flash-chapter-pills");
+  pillRow.innerHTML = "";
+  var allPill = makePill("全章", flashState.chapter===0, function(){ flashState.chapter=0; buildDeck(); });
+  pillRow.appendChild(allPill);
+  CHAPTERS.forEach(function(ch){
+    pillRow.appendChild(makePill("第"+ch.id+"章", flashState.chapter===ch.id, function(){ flashState.chapter=ch.id; buildDeck(); }));
+  });
+  buildDeck();
+}
+function makePill(label, active, onClick){
+  var b = document.createElement("button");
+  b.className = "pill" + (active ? " active" : "");
+  b.textContent = label;
+  b.addEventListener("click", onClick);
+  return b;
+}
+function buildDeck(){
+  flashState.deck = shuffle(cardsOf(flashState.chapter));
+  flashState.index = 0;
+  flashState.flipped = false;
+  renderFlashSetup_pillsOnly();
+  renderCard();
+}
+function renderFlashSetup_pillsOnly(){
+  var pillRow = document.getElementById("flash-chapter-pills");
+  Array.prototype.forEach.call(pillRow.children, function(el, i){
+    var isAll = i===0;
+    var active = isAll ? flashState.chapter===0 : flashState.chapter===CHAPTERS[i-1].id;
+    el.classList.toggle("active", active);
+  });
+}
+function renderCard(){
+  var deck = flashState.deck;
+  if(deck.length===0){
+    document.getElementById("fc-term").textContent = "この章のカードはありません";
+    document.getElementById("fc-def").textContent = "";
+    document.getElementById("fc-count").textContent = "0 / 0";
+    return;
+  }
+  var card = deck[flashState.index];
+  var ch = chapterInfo(card.ch);
+  document.getElementById("fc-term").textContent = card.term;
+  document.getElementById("fc-def").textContent = card.def;
+  document.getElementById("fc-tag-front").textContent = "第"+card.ch+"章";
+  document.getElementById("fc-tag-back").textContent = "第"+card.ch+"章";
+  document.getElementById("fc-tag-front").style.setProperty("--ch-color", ch.color);
+  document.getElementById("fc-tag-back").style.setProperty("--ch-color", ch.color);
+  document.getElementById("fc-count").textContent = (flashState.index+1) + " / " + deck.length;
+  document.getElementById("fc-progress-fill").style.width = pct(flashState.index+1, deck.length)+"%";
+
+  var masteredInDeck = deck.filter(function(c){ return state.cards[c.id]==="mastered"; }).length;
+  document.getElementById("fc-mastered-count").textContent = "覚えた " + masteredInDeck;
+
+  var flashcard = document.getElementById("flashcard");
+  flashcard.classList.toggle("flipped", flashState.flipped);
+}
+function flip(){ flashState.flipped = !flashState.flipped; document.getElementById("flashcard").classList.toggle("flipped", flashState.flipped); }
+function nextCard(){
+  if(flashState.deck.length===0) return;
+  flashState.index = (flashState.index+1) % flashState.deck.length;
+  flashState.flipped = false;
+  renderCard();
+}
+function prevCard(){
+  if(flashState.deck.length===0) return;
+  flashState.index = (flashState.index-1+flashState.deck.length) % flashState.deck.length;
+  flashState.flipped = false;
+  renderCard();
+}
+function markCard(status){
+  if(flashState.deck.length===0) return;
+  var card = flashState.deck[flashState.index];
+  state.cards[card.id] = status;
+  saveState();
+  renderCard();
+  setTimeout(nextCard, 260);
+}
+document.getElementById("flashcard").addEventListener("click", flip);
+document.getElementById("flashcard").addEventListener("keydown", function(e){ if(e.key===" "){ e.preventDefault(); flip(); } });
+document.getElementById("fc-next").addEventListener("click", nextCard);
+document.getElementById("fc-prev").addEventListener("click", prevCard);
+document.getElementById("fc-shuffle").addEventListener("click", function(){ flashState.deck = shuffle(flashState.deck); flashState.index=0; flashState.flipped=false; renderCard(); });
+document.getElementById("fc-mark-review").addEventListener("click", function(){ markCard("review"); });
+document.getElementById("fc-mark-mastered").addEventListener("click", function(){ markCard("mastered"); });
+document.addEventListener("keydown", function(e){
+  if(currentView!=="flash") return;
+  if(e.key==="ArrowRight") nextCard();
+  if(e.key==="ArrowLeft") prevCard();
+});
+
+/* ============================================================
+   CHAPTER QUIZ
+   ============================================================ */
+var quizState = {chapter:0, questions:[], index:0, answers:[], locked:false};
+
+function renderQuizSetup(){
+  document.getElementById("quiz-setup").hidden = false;
+  document.getElementById("quiz-play").hidden = true;
+  document.getElementById("quiz-result").hidden = true;
+  var pillRow = document.getElementById("quiz-chapter-pills");
+  pillRow.innerHTML = "";
+  CHAPTERS.forEach(function(ch){
+    var qc = quizOf(ch.id).length;
+    pillRow.appendChild(makePill("第"+ch.id+"章 ("+qc+"問)", quizState.chapter===ch.id, function(){
+      quizState.chapter = ch.id;
+      renderQuizSetup();
+    }));
+  });
+  if(quizState.chapter===0) quizState.chapter = CHAPTERS[0].id;
+}
+document.getElementById("quiz-start-btn").addEventListener("click", function(){
+  startQuiz(quizState.chapter);
+});
+function startQuiz(ch){
+  quizState.questions = shuffle(quizOf(ch));
+  quizState.index = 0;
+  quizState.answers = [];
+  quizState.locked = false;
+  document.getElementById("quiz-setup").hidden = true;
+  document.getElementById("quiz-result").hidden = true;
+  document.getElementById("quiz-play").hidden = false;
+  renderQuizQuestion(quizState, "quiz-play", function(){ finishQuiz(); });
+}
+function renderQuizQuestion(qs, containerId, onFinish){
+  var container = document.getElementById(containerId);
+  var q = qs.questions[qs.index];
+  var chColor = chapterInfo(q.ch).color;
+  qs.locked = false;
+
+  var html = '';
+  html += '<div class="q-progress"><span>問 '+(qs.index+1)+' / '+qs.questions.length+'</span>';
+  if(qs.timerLabel) html += '<span class="q-timer mono" id="q-timer">'+qs.timerLabel+'</span>';
+  html += '</div>';
+  html += '<div class="q-card">';
+  html += '<span class="q-tag" style="--ch-color:'+chColor+'">第'+q.ch+'章</span>';
+  html += '<div class="q-text">'+q.q+'</div>';
+  html += '<div class="opt-list" id="opt-list">';
+  var letters = ["A","B","C"];
+  q.o.forEach(function(opt, i){
+    html += '<button class="opt" data-i="'+i+'"><span class="opt-letter">'+letters[i]+'</span><span>'+opt+'</span></button>';
+  });
+  html += '</div><div id="explain-slot"></div></div>';
+  html += '<div class="btn-row"><button class="btn btn-ghost" id="q-quit">'+(containerId==="exam-play" ? "試験を中断" : "クイズを中断")+'</button><button class="btn btn-primary" id="q-next" style="display:none;">次の問題</button></div>';
+  container.innerHTML = html;
+
+  Array.prototype.forEach.call(container.querySelectorAll(".opt"), function(btn){
+    btn.addEventListener("click", function(){
+      if(qs.locked) return;
+      qs.locked = true;
+      var chosen = parseInt(btn.getAttribute("data-i"),10);
+      var correct = q.c;
+      qs.answers.push({q:q, chosen:chosen, correct:correct});
+      Array.prototype.forEach.call(container.querySelectorAll(".opt"), function(o, i){
+        o.classList.add("disabled");
+        if(i===correct) o.classList.add("correct");
+        if(i===chosen && chosen!==correct) o.classList.add("incorrect");
+      });
+      document.getElementById("explain-slot").innerHTML = '<div class="explain"><b>'+(chosen===correct ? "正解です。" : "残念、不正解です。")+'</b> '+q.e+'</div>';
+      var nextBtn = document.getElementById("q-next");
+      nextBtn.style.display = "inline-block";
+      nextBtn.textContent = (qs.index+1 < qs.questions.length) ? "次の問題" : "結果を見る";
+      nextBtn.focus();
+    });
+  });
+  document.getElementById("q-next").addEventListener("click", function(){
+    qs.index++;
+    if(qs.index < qs.questions.length){
+      renderQuizQuestion(qs, containerId, onFinish);
+    }else{
+      onFinish();
+    }
+  });
+  document.getElementById("q-quit").addEventListener("click", function(){
+    if(containerId==="exam-play") stopExamTimer();
+    onFinish(true);
+  });
+  if(qs.afterRender) qs.afterRender();
+}
+function finishQuiz(quit){
+  document.getElementById("quiz-play").hidden = true;
+  var result = document.getElementById("quiz-result");
+  result.hidden = false;
+  var correctCount = quizState.answers.filter(function(a){ return a.chosen===a.correct; }).length;
+  var total = quit ? quizState.answers.length : quizState.questions.length;
+  var percentage = pct(correctCount, total || 1);
+
+  var prev = state.quizHistory[quizState.chapter] || {best:0, attempts:0};
+  state.quizHistory[quizState.chapter] = {best: Math.max(prev.best, percentage), attempts: prev.attempts+1};
+  saveState();
+
+  var msg = percentage>=80 ? "素晴らしい仕上がりです。この調子で他の章も進めましょう。" :
+            percentage>=50 ? "あと一歩。間違えた問題を復習して再挑戦しましょう。" :
+            "フラッシュカードで基礎用語を復習してから、もう一度挑戦しましょう。";
+
+  var html = '<div class="result-hero"><div class="result-score">'+percentage+'<span>%</span></div>';
+  html += '<div class="result-msg">'+correctCount+' / '+total+' 問正解 &middot; 第'+quizState.chapter+'章</div>';
+  html += '<div class="result-msg">'+msg+'</div></div>';
+  html += '<div class="setup-label">解答の振り返り</div><div class="review-list">';
+  quizState.answers.forEach(function(a){
+    var letters=["A","B","C"];
+    html += '<div class="review-item"><div class="rq">'+a.q.q+'</div>';
+    html += '<div class="ra '+(a.chosen===a.correct?"right":"wrong")+'">あなたの回答: <b>'+letters[a.chosen]+'. '+a.q.o[a.chosen]+'</b></div>';
+    if(a.chosen!==a.correct) html += '<div class="ra right">正解: <b>'+letters[a.correct]+'. '+a.q.o[a.correct]+'</b></div>';
+    html += '</div>';
+  });
+  html += '</div><div class="btn-row" style="margin-top:20px;"><button class="btn btn-primary" id="quiz-retry">もう一度挑戦</button><button class="btn btn-ghost" id="quiz-back">章選択に戻る</button></div>';
+  result.innerHTML = html;
+
+  document.getElementById("quiz-retry").addEventListener("click", function(){ startQuiz(quizState.chapter); });
+  document.getElementById("quiz-back").addEventListener("click", function(){ renderQuizSetup(); });
+}
+
+/* ============================================================
+   MOCK EXAM
+   ============================================================ */
+var examState = {count:20, questions:[], index:0, answers:[], locked:false, timerLabel:"", secondsLeft:0, timerId:null};
+
+function renderExamSetup(){
+  document.getElementById("exam-setup").hidden = false;
+  document.getElementById("exam-play").hidden = true;
+  document.getElementById("exam-result").hidden = true;
+  var pillRow = document.getElementById("exam-count-pills");
+  pillRow.innerHTML = "";
+  [10,20,30,QUIZ.length].forEach(function(n, i){
+    var label = (i===3) ? "全"+n+"問" : n+"問";
+    pillRow.appendChild(makePill(label, examState.count===n, function(){ examState.count=n; renderExamSetup(); }));
+  });
+}
+document.getElementById("exam-start-btn").addEventListener("click", function(){
+  startExam();
+});
+function startExam(){
+  var pool = shuffle(QUIZ).slice(0, Math.min(examState.count, QUIZ.length));
+  examState.questions = pool;
+  examState.index = 0;
+  examState.answers = [];
+  examState.locked = false;
+  examState.secondsLeft = pool.length * 90;
+  document.getElementById("exam-setup").hidden = true;
+  document.getElementById("exam-result").hidden = true;
+  document.getElementById("exam-play").hidden = false;
+  startExamTimer();
+  renderExamQuestion();
+}
+function startExamTimer(){
+  stopExamTimer();
+  examState.timerId = setInterval(function(){
+    examState.secondsLeft--;
+    updateTimerDisplay();
+    if(examState.secondsLeft<=0){ stopExamTimer(); finishExam(); }
+  }, 1000);
+}
+function stopExamTimer(){ if(examState.timerId){ clearInterval(examState.timerId); examState.timerId=null; } }
+function updateTimerDisplay(){
+  var el = document.getElementById("q-timer");
+  if(!el) return;
+  var m = Math.floor(examState.secondsLeft/60);
+  var s = examState.secondsLeft%60;
+  el.textContent = "残り " + m + ":" + (s<10?"0":"")+s;
+  el.classList.toggle("low", examState.secondsLeft<60);
+}
+function renderExamQuestion(){
+  examState.timerLabel = "残り --:--";
+  examState.afterRender = updateTimerDisplay;
+  renderQuizQuestion(examState, "exam-play", function(quit){
+    stopExamTimer();
+    finishExam(quit);
+  });
+}
+function finishExam(quit){
+  stopExamTimer();
+  document.getElementById("exam-play").hidden = true;
+  var result = document.getElementById("exam-result");
+  result.hidden = false;
+  var correctCount = examState.answers.filter(function(a){ return a.chosen===a.correct; }).length;
+  var total = examState.answers.length;
+  var percentage = pct(correctCount, total || 1);
+  var pass = percentage>=70;
+
+  state.examHistory.push({pct:percentage, total:total, date:Date.now()});
+  saveState();
+
+  var byChapter = {};
+  CHAPTERS.forEach(function(ch){ byChapter[ch.id]={correct:0,total:0}; });
+  examState.answers.forEach(function(a){
+    byChapter[a.q.ch].total++;
+    if(a.chosen===a.correct) byChapter[a.q.ch].correct++;
+  });
+
+  var html = '<div class="result-hero"><div class="result-score" style="color:'+(pass?"var(--success)":"var(--danger)")+'">'+percentage+'<span>%</span></div>';
+  html += '<div class="result-msg">'+correctCount+' / '+total+' 問正解</div>';
+  html += '<div class="result-msg" style="font-weight:700;color:'+(pass?"var(--success)":"var(--danger)")+'">'+(pass ? "合格ラインの70%を突破しています!" : "合格ラインの70%まであと少し。弱点の章を復習しましょう。")+'</div></div>';
+  html += '<div class="panel"><div class="setup-label" style="margin-top:0;">章別の正答率</div><div class="chapter-breakdown">';
+  CHAPTERS.forEach(function(ch){
+    var b = byChapter[ch.id];
+    var p = pct(b.correct, b.total);
+    html += '<div class="cb-row"><span class="cb-name">第'+ch.id+'章 '+ch.title+'</span><div class="progress-track" style="--ch-color:'+ch.color+'"><div class="progress-fill" style="width:'+p+'%;background:'+ch.color+'"></div></div><span class="cb-pct">'+(b.total? p+"%" : "–")+'</span></div>';
+  });
+  html += '</div></div>';
+  html += '<div class="setup-label">解答の振り返り</div><div class="review-list">';
+  examState.answers.forEach(function(a){
+    var letters=["A","B","C"];
+    html += '<div class="review-item"><div class="rq">第'+a.q.ch+'章 &middot; '+a.q.q+'</div>';
+    html += '<div class="ra '+(a.chosen===a.correct?"right":"wrong")+'">あなたの回答: <b>'+letters[a.chosen]+'. '+a.q.o[a.chosen]+'</b></div>';
+    if(a.chosen!==a.correct) html += '<div class="ra right">正解: <b>'+letters[a.correct]+'. '+a.q.o[a.correct]+'</b></div>';
+    html += '</div>';
+  });
+  html += '</div><div class="btn-row" style="margin-top:20px;"><button class="btn btn-primary" id="exam-retry">もう一度挑戦</button><button class="btn btn-ghost" id="exam-back">設定に戻る</button></div>';
+  result.innerHTML = html;
+
+  document.getElementById("exam-retry").addEventListener("click", function(){ startExam(); });
+  document.getElementById("exam-back").addEventListener("click", function(){ renderExamSetup(); });
+}
+
+/* ============================================================
+   GLOSSARY
+   ============================================================ */
+var glossState = {chapter:0, search:""};
+function renderGlossary(){
+  var pillRow = document.getElementById("gloss-chapter-pills");
+  pillRow.innerHTML = "";
+  pillRow.appendChild(makePill("全章", glossState.chapter===0, function(){ glossState.chapter=0; renderGlossaryList(); renderGlossary_pills(); }));
+  CHAPTERS.forEach(function(ch){
+    pillRow.appendChild(makePill("第"+ch.id+"章", glossState.chapter===ch.id, function(){ glossState.chapter=ch.id; renderGlossaryList(); renderGlossary_pills(); }));
+  });
+  document.getElementById("gloss-search").value = glossState.search;
+  renderGlossaryList();
+}
+function renderGlossary_pills(){
+  var pillRow = document.getElementById("gloss-chapter-pills");
+  Array.prototype.forEach.call(pillRow.children, function(el,i){
+    var active = i===0 ? glossState.chapter===0 : glossState.chapter===CHAPTERS[i-1].id;
+    el.classList.toggle("active", active);
+  });
+}
+document.getElementById("gloss-search").addEventListener("input", function(e){
+  glossState.search = e.target.value;
+  renderGlossaryList();
+});
+function renderGlossaryList(){
+  var list = document.getElementById("gloss-list");
+  list.innerHTML = "";
+  var term = glossState.search.trim().toLowerCase();
+  var chapters = glossState.chapter===0 ? CHAPTERS : CHAPTERS.filter(function(c){return c.id===glossState.chapter;});
+  var anyResults = false;
+
+  chapters.forEach(function(ch){
+    var items = cardsOf(ch.id).filter(function(c){
+      if(!term) return true;
+      return c.term.toLowerCase().indexOf(term)>-1 || c.def.toLowerCase().indexOf(term)>-1;
+    });
+    if(items.length===0) return;
+    anyResults = true;
+    var group = document.createElement("div");
+    group.className = "gloss-group";
+    group.style.setProperty("--gc", ch.color);
+    var h = document.createElement("h3");
+    h.textContent = "第"+ch.id+"章 &middot; " + ch.title;
+    h.innerHTML = "第"+ch.id+"章 &middot; " + ch.title;
+    group.appendChild(h);
+    var dl = document.createElement("dl");
+    items.forEach(function(c){
+      var item = document.createElement("div");
+      item.className = "gloss-item";
+      item.innerHTML = '<dt>'+c.term+'</dt><dd>'+c.def+'</dd>';
+      dl.appendChild(item);
+    });
+    group.appendChild(dl);
+    list.appendChild(group);
+  });
+  if(!anyResults){
+    var empty = document.createElement("div");
+    empty.className = "empty-note";
+    empty.textContent = "「"+glossState.search+"」に一致する用語が見つかりませんでした。";
+    list.appendChild(empty);
+  }
+}
+
+/* ============================================================
+   INIT
+   ============================================================ */
+renderNav();
+renderHome();
+renderFlashSetup();
+renderQuizSetup();
+renderExamSetup();
+})();
+</script>
