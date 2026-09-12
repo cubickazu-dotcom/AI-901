@@ -343,6 +343,10 @@ a{color:var(--accent);}
   box-shadow:0 12px 30px -18px hsl(var(--shadow) / .35);
 }
 .fc-face.back{transform:rotateY(180deg); background:var(--accent-soft);}
+.flashcard.status-mastered .fc-face{border-color:var(--success); background:var(--success-soft);}
+.flashcard.status-mastered .fc-face.back{background:var(--success-soft);}
+.flashcard.status-review .fc-face{border-color:var(--danger); background:var(--danger-soft);}
+.flashcard.status-review .fc-face.back{background:var(--danger-soft);}
 .fc-tag{
   font-family:"JetBrains Mono",monospace;
   font-size:11px; font-weight:700; letter-spacing:.05em;
@@ -363,12 +367,14 @@ a{color:var(--accent);}
 }
 .iconbtn:hover{border-color:var(--accent); color:var(--accent);}
 .iconbtn svg{width:18px;height:18px;}
+.iconbtn:disabled{opacity:.35; cursor:default; pointer-events:none;}
 .status-btn{
   padding:11px 18px; border-radius:10px; font-weight:700; font-size:13.5px; cursor:pointer; border:1px solid;
 }
 .status-btn.review{background:var(--danger-soft); border-color:transparent; color:var(--danger);}
 .status-btn.mastered{background:var(--success-soft); border-color:transparent; color:var(--success);}
 .status-btn:hover{filter:brightness(0.96);}
+.status-btn.is-active{outline:2px solid currentColor; outline-offset:2px;}
 
 /* ============ QUIZ ============ */
 .quiz-setup .pill-row{margin-bottom:6px;}
@@ -556,6 +562,7 @@ a{color:var(--accent);}
           <button class="iconbtn" id="fc-prev" title="前へ" aria-label="前へ"><svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 18l-6-6 6-6"/></svg></button>
           <button class="status-btn review" id="fc-mark-review">もう一度</button>
           <button class="status-btn mastered" id="fc-mark-mastered">覚えた</button>
+          <button class="iconbtn" id="fc-reset" title="判定をリセット" aria-label="判定をリセット"><svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 12a9 9 0 1 0 3-6.7"/><path d="M3 4v5h5"/></svg></button>
           <button class="iconbtn" id="fc-next" title="次へ" aria-label="次へ"><svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 18l6-6-6-6"/></svg></button>
           <button class="iconbtn" id="fc-shuffle" title="シャッフル" aria-label="シャッフル"><svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M16 3h5v5M4 20L21 3M21 16v5h-5M15 15l6 6M4 4l5 5"/></svg></button>
         </div>
@@ -608,7 +615,7 @@ a{color:var(--accent);}
       <div class="page-head">
         <span class="eyebrow">Glossary</span>
         <h1>用語集</h1>
-        <p>全79語を章別に一覧できます。試験直前の見直しにどうぞ。</p>
+        <p>全98語を章別に一覧できます。試験直前の見直しにどうぞ。</p>
       </div>
       <div class="search-box">
         <svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="7"/><path d="M21 21l-4.3-4.3"/></svg>
@@ -653,7 +660,7 @@ var CHAPTERS = [
 ];
 
 /* ============================================================
-   FLASHCARD DATA (79 terms)
+   FLASHCARD DATA (98 terms)
    ============================================================ */
 var FLASHCARDS = [
 // --- 第1章 人工知能の概要 ---
@@ -695,6 +702,14 @@ var FLASHCARDS = [
 {id:"c2-17",ch:2,term:"Azure サブスクリプション",def:"Azure の使用に必要な、管理・課金・スケールの単位。"},
 {id:"c2-18",ch:2,term:"リソースグループ",def:"Azure リソースを階層に整理して管理する仕組み。ポリシーやアクセス権限管理、ロックなどが行える。"},
 {id:"c2-19",ch:2,term:"エンドポイント",def:"アプリやサービスが外部とデータを送受信するために公開している、アクセス用の URL や接続先のこと。キーで認証してアクセスする。"},
+{id:"c2-20",ch:2,term:"Foundry プロジェクト",def:"Foundry リソース (親リソース) の配下に作成する作業単位。モデルのデプロイ、エージェントの構築、ナレッジ/ツールの管理などを行うワークスペース。1つの Foundry リソースに複数のプロジェクトを作成できる。"},
+{id:"c2-21",ch:2,term:"reasoning_effort パラメーター",def:"モデルが応答を生成する際の思考の深さ (推論の計算量) を調整するパラメーター。low や minimal に設定すると応答速度が向上する。"},
+{id:"c2-22",ch:2,term:"エージェントとして保存",def:"プレイグラウンドで検証したモデル・手順(システムプロンプト)・ツールの構成に名前を付け、再利用可能なエージェントとして保存する操作。"},
+{id:"c2-23",ch:2,term:"ナレッジ (知識) ツール",def:"エージェントに独自ファイル (社内規定など) をアップロードして参照させる機能。ベクトルインデックスとして保存され、RAG の実践的な実装にあたる。"},
+{id:"c2-24",ch:2,term:"Web アプリのプレビュー (発行)",def:"作成したエージェントを「発行する」ことで生成される、ブラウザから直接チャットできるプレビュー用 Web アプリ。"},
+{id:"c2-25",ch:2,term:"Few-Shot プロンプティング",def:"期待する出力の例をいくつかプロンプト内に含めておくことで、同様の文字数・文体・テイストの出力を得やすくするプロンプト技法。"},
+{id:"c2-26",ch:2,term:"オーディエンス・ペルソナパターン",def:"「対象は30代女性です」のように想定する読み手・対象者像をプロンプト内で具体的に指定し、その対象に適した出力を引き出す技法。"},
+{id:"c2-27",ch:2,term:"方向性刺激プロンプティング",def:"要約などで注目してほしいポイント (キーワード) をプロンプトに含めることで、そのポイントを中心とした出力を誘導するプロンプト技法。"},
 // --- 第3章 自然言語処理 ---
 {id:"c3-01",ch:3,term:"自然言語処理 (NLP)",def:"人間の言語を機械で処理し、内容を抽出すること。言葉の「あいまいさ」や「意味の重複」を場面に応じて処理する。"},
 {id:"c3-02",ch:3,term:"テキスト正規化",def:"句読点の削除やすべての単語を小文字に変換するなど、テキストを前処理すること。"},
@@ -715,6 +730,8 @@ var FLASHCARDS = [
 {id:"c3-17",ch:3,term:"言語検出",def:"入力テキストの言語を判別し、言語コードを返すこと。"},
 {id:"c3-18",ch:3,term:"個人識別情報 (PII) 検出",def:"電話番号・住所・健康情報 (PHI) などの機密データを識別すること。マスキング処理などに利用される。"},
 {id:"c3-19",ch:3,term:"Azure Language サービス",def:"Microsoft Foundry の言語プレイグラウンドで実行できる、テキスト分析・カスタム質問応答・会話言語理解などを含むサービス群。"},
+{id:"c3-20",ch:3,term:"テキストの PII マスキング",def:"入力テキストから氏名・日付などの個人識別情報 (PII) を検出し、マスキング (置換) する Azure Language の機能。検出パラメーターは編集画面の [構成] からカスタマイズできる。"},
+{id:"c3-21",ch:3,term:"ドキュメント / 会話の PII マスキング",def:"Azure Language が提供する PII マスキングの派生機能。ファイル全体や会話ログ (発話者ごとのやり取り) に含まれる個人情報を検出・マスキングする。"},
 // --- 第4章 AI 音声 ---
 {id:"c4-01",ch:4,term:"音声認識 (Speech to Text)",def:"音声をテキストに変換すること。ファイル・ストリーム・マイクからの音声入力に対応する。"},
 {id:"c4-02",ch:4,term:"音声合成 (Text to Speech)",def:"テキストを自然な音声 (音声波形) に変換すること。"},
@@ -723,6 +740,9 @@ var FLASHCARDS = [
 {id:"c4-05",ch:4,term:"韻律 (プロソディ)",def:"ピッチや音色など、自然な発音と話し方のリズムを明確にする要素。音声合成の重要な段階の一つ。"},
 {id:"c4-06",ch:4,term:"Azure Speech",def:"Microsoft Foundry Tools で利用できる AI 音声サービス。音声テキスト変換・テキスト読み上げ・音声翻訳などを含む。"},
 {id:"c4-07",ch:4,term:"Azure Voice Live",def:"リアルタイム接続を開いて音声をストリーミングし、音声応答や割り込みを処理する、リアルタイム音声のためのサービス。"},
+{id:"c4-08",ch:4,term:"音声モード (Foundry エージェント)",def:"Foundry のエージェント設定で有効化することで、Azure Speech Voice Live と統合し、話し言葉でエージェントと対話できるようにする機能。"},
+{id:"c4-09",ch:4,term:"音声入力 / 音声出力の構成",def:"エージェントの音声モードで設定する項目。音声入力では音声認識モデル (Azure Speech など) を、音声出力では読み上げに使う声 (例: Ava Multilingual) を選択できる。"},
+{id:"c4-10",ch:4,term:"Azure Speech Voice Live SDK (azure-ai-voicelive)",def:"カスタムアプリケーションでエージェントの音声機能を利用するために、ストリーミング音声の入出力を処理するコードを書くための Python SDK。"},
 // --- 第5章 コンピュータービジョン ---
 {id:"c5-01",ch:5,term:"コンピュータービジョン (Computer Vision)",def:"コンピューターとシステムが画像・動画・視覚データから意味のある情報を導き出す人工知能の総称。ピクセルの操作と分析に基づく。"},
 {id:"c5-02",ch:5,term:"画像の分類",def:"画像に何が写っているのかを検出するタスク。"},
@@ -734,17 +754,23 @@ var FLASHCARDS = [
 {id:"c5-08",ch:5,term:"マルチモーダルモデル",def:"テキスト・画像・音声など複数の種類のデータを一度に処理できる AI のこと。"},
 {id:"c5-09",ch:5,term:"ビジョントランスフォーマー (ViT)",def:"画像をパッチ (小領域) に分割してトークンとして扱い、トランスフォーマー構造で画像認識を行うモデル。"},
 {id:"c5-10",ch:5,term:"拡散モデル (Diffusion Model)",def:"データに「ノイズを加えていく過程」とその「ノイズを取り除いていく過程」を学習する、画像生成 AI の核となる生成モデル。"},
+{id:"c5-11",ch:5,term:"マルチモーダル入力によるプロンプト",def:"テキストと画像の両方を1つのプロンプトに含めて生成 AI モデルに送信する方式。OpenAI Responses API では \"input_text\" と \"input_image\" を組み合わせて指定する。"},
+{id:"c5-12",ch:5,term:"画像添付によるチャット分析",def:"Foundry プレイグラウンドで「ファイルの添付」から画像をアップロードし、その画像の内容に基づいた回答 (食材からのレシピ提案など) を生成させる操作。"},
 // --- 第6章 情報抽出 ---
 {id:"c6-01",ch:6,term:"AI 情報抽出",def:"請求書・契約書・名刺・音声・画像などのデジタルコンテンツを分析し、有用な構造化データに変換するワークロード。"},
 {id:"c6-02",ch:6,term:"光学文字認識 (OCR)",def:"画像や紙の文書に写った文字をコンピューターが読み取り、デジタルな文字データへ変換する技術。"},
 {id:"c6-03",ch:6,term:"OCR パイプライン",def:"画像の取得と入力 → 前処理とイメージの強化 → テキスト領域の検出 → 文字認識と分類 → 出力生成と後処理、の5ステップで構成される処理の流れ。"},
 {id:"c6-04",ch:6,term:"Azure Content Understanding",def:"構造化ドキュメント・画像・オーディオ・ビデオから分析情報を抽出できる、生成型 AI ベースのマルチモーダル分析サービス。"},
 {id:"c6-05",ch:6,term:"スキーマ",def:"Content Understanding で、抽出したいフィールドと構造を定義するもの。"},
-{id:"c6-06",ch:6,term:"アナライザー",def:"スキーマに基づいてコンテンツを分析し、構造化された JSON 結果を返す Content Understanding の機能。"}
+{id:"c6-06",ch:6,term:"アナライザー",def:"スキーマに基づいてコンテンツを分析し、構造化された JSON 結果を返す Content Understanding の機能。"},
+{id:"c6-07",ch:6,term:"コンテンツの解釈 (プレイグラウンド)",def:"Content Understanding のプレイグラウンド機能。請求書・領収書・契約書・米国税務書類・コールセンター記録など、業務書類に特化した事前構築済みアナライザーを選んで文書を解析できる。"},
+{id:"c6-08",ch:6,term:"チャット補完モデルと埋め込みモデル",def:"Content Understanding のアナライザーを使用するために必要な2種類のモデルデプロイ。チャット補完モデルはフィールドの解釈・生成を、埋め込みモデルはテキストのベクトル化を担う。"},
+{id:"c6-09",ch:6,term:"フィールドの信頼度スコア",def:"Content Understanding の解析結果で、抽出された各フィールドに付与される「どれだけ確信度が高いか」を示すパーセンテージ値。"},
+{id:"c6-10",ch:6,term:"分析結果の JSON 出力",def:"Content Understanding の解析結果は、フィールド・Markdown・テーブル・JSON など複数のビューで確認でき、JSON 形式はアプリケーションへの組み込みに利用される。"}
 ];
 
 /* ============================================================
-   QUIZ DATA (49 questions) — o: options, c: correct index, e: explanation
+   QUIZ DATA (56 questions) — o: options, c: correct index, e: explanation
    ============================================================ */
 var QUIZ = [
 // 第1章
@@ -766,6 +792,8 @@ var QUIZ = [
 {id:"q2-08",ch:2,q:"検索拡張生成 (RAG) の主な利点は何ですか?",o:["モデルの再学習や微調整をせずに独自データに基づいた回答を生成できる","モデルのパラメーター数を削減し軽量化できる","音声をテキストに変換する速度が向上する"],c:0,e:"RAGはモデルのトレーニングや微調整をすることなく、独自データ (社内文書など) をグラウンディングとして活用し、回答をカスタマイズできる手法です。"},
 {id:"q2-09",ch:2,q:"AIエージェントを構成する要素として本文中で挙げられていないものはどれですか?",o:["モデル","手順","データベーススキーマ"],c:2,e:"AIエージェントは、モデル・手順 (システムプロンプト)・ツール (ナレッジ、アクション) で構成されます。データベーススキーマは構成要素として挙げられていません。"},
 {id:"q2-10",ch:2,q:"MCP (Model Context Protocol) の目的として最も適切なものはどれですか?",o:["AIエージェントと外部ツール・データをつなぐための共通プロトコルを提供すること","生成AIモデルのパラメーター数を圧縮すること","Azureサブスクリプションの課金体系を管理すること"],c:0,e:"MCPは、AIエージェントが外部のツールやデータと連携するための共通プロトコルであり、個別実装を減らし再利用性を高めます。"},
+{id:"q2-11",ch:2,q:"生成AIエージェントに独自のファイル (社内規定など) をアップロードして読み込ませ、その内容を踏まえて回答させる Microsoft Foundry の機能は、どの技術を実践したものですか?",o:["検索拡張生成 (RAG) のナレッジツールとしての実装","ファインチューニングによるモデルの再学習","トークン化ルールのカスタマイズ"],c:0,e:"エージェントにファイルをアップロードし参照させる「ナレッジ」機能は、モデルを再学習せずに独自データをグラウンディングとして活用する RAG の実践例です。"},
+{id:"q2-12",ch:2,q:"Microsoft Foundry のプレイグラウンドで応答速度を上げたい場合、reasoning_effort パラメーターにどのような値を設定しますか?",o:["low または minimal","high または maximum","auto または default"],c:0,e:"reasoning_effort を low や minimal に下げると、モデルの思考の深さ (推論計算量) が減り、応答速度が向上します。"},
 // 第3章
 {id:"q3-01",ch:3,q:"自然言語モデル (NLP) でのトークン化の主な目的は何ですか?",o:["テキストを別の言語に翻訳するため","大量のドキュメントを要約するため","テキストを分析用により小さな単位に分割するため"],c:2,e:"トークン化は、テキスト内の個々の単語や記号をトークンという最小単位に置き換え、分析しやすくする処理です。"},
 {id:"q3-02",ch:3,q:"自然言語処理 (NLP) における埋め込み表現の役割を最もよく説明しているのは次のうちどれですか?",o:["テキストデータを2次元空間で視覚化して、解釈を容易にする。","大きなテキストコーパスを短く意味のある文にまとめる。","言語トークンを意味関係をキャプチャするベクトルに変換する。"],c:2,e:"埋め込み表現は、単語や文をその意味的な関係性を捉えたベクトルとして表現する手法です。"},
@@ -775,6 +803,7 @@ var QUIZ = [
 {id:"q3-06",ch:3,q:"ステミングの説明として正しいものはどれですか?",o:["単語をその辞書に載っている基本形に変換するプロセス","単語の末尾をルールに基づいて機械的に切り落とし語幹を抽出するプロセス","文法的役割を示す品詞ラベルを単語に付与するプロセス"],c:1,e:"ステミングは単語の末尾を機械的に切り落として語幹 (stem) を抽出する処理です (例: connected → connect)。1番目はレンマ化、3番目は品詞タグ付けの説明です。"},
 {id:"q3-07",ch:3,q:"TF-IDF が重視する単語とはどのようなものですか?",o:["すべての文書に均等に出現する単語","特定の文書によく出現するが他の文書にはあまり出現しない単語","ストップワードとして除外される単語"],c:1,e:"TF-IDFは、他の文書でも多く出る単語の重要度を下げ、その文書らしい (特徴的な) 単語の重要度を高める統計手法です。"},
 {id:"q3-08",ch:3,q:"PII検出によって識別される情報として適切なものはどれですか?",o:["電話番号やメールアドレスなどの個人を特定できる情報","文章の感情的なトーン","文書内のキーフレーズ"],c:0,e:"PII (個人識別情報) 検出は、電話番号・住所・メールアドレスなど個人を特定できる情報を識別する機能です。"},
+{id:"q3-09",ch:3,q:"Azure Language の「テキストの PII マスキング」機能で、検出対象から特定の情報 (例: 文中の日付) を除外したい場合、どの操作を行いますか?",o:["編集画面の[構成]オプションで検出パラメーターを変更する","埋め込みモデルを別のものに差し替える","トークン化のルールを手動で再学習する"],c:0,e:"検出パラメーターは[編集]から開く[構成]オプションで変更でき、特定の情報カテゴリを検出対象外に設定できます。"},
 // 第4章
 {id:"q4-01",ch:4,q:"音声認識の前処理段階でどのような活動が起こるのでしょうか?",o:["音声は.wmvフォーマットに変換されます。","音声信号に背景ノイズが加わります。","特徴ベクトルはモデリングのために音声波形から抽出されます。"],c:2,e:"前処理と特徴づけの段階では、特定の周波数における信号強度を特徴ベクトルとして音声波形から抽出します。"},
 {id:"q4-02",ch:4,q:"音素とは何ですか?",o:["クリーンアップの過程で信号から除去されるアーティファクト","音声における最小の音の単位","音声を生成するAIモデル"],c:1,e:"音素 (Phoneme) は音声における最小の音の単位で、音響モデリングで特徴とマッピングされます。"},
@@ -784,6 +813,7 @@ var QUIZ = [
 {id:"q4-06",ch:4,q:"音声認識 (Speech to Text) の一般的なユースケースとして本文中に挙げられていないものはどれですか?",o:["カスタマーサービスとサポート","会議とインタビューの書き起こし","テキストから画像の生成"],c:2,e:"音声認識のユースケースにはカスタマーサービス、会議の書き起こし、音声ノート取りなどがあります。画像生成は音声認識とは無関係です。"},
 {id:"q4-07",ch:4,q:"音声合成のプロセスにおいて「正規化されたテキストを音素にマッピングする」段階を何と呼びますか?",o:["波形符号化","音声 / 発音モデリング","正規化"],c:1,e:"音声/発音モデリングの段階で、正規化されたテキストを音素 (単語の音) にマッピングします。"},
 {id:"q4-08",ch:4,q:"Azure Voice Live が実現するものは何ですか?",o:["リアルタイム音声を使用した対話","音声ファイルの永久保存","テキストの多言語翻訳"],c:0,e:"Azure Voice Liveは、生成AIモデルのエージェントで音声モデルをオンにすることでリアルタイム音声のやり取りを実現します。"},
+{id:"q4-09",ch:4,q:"Microsoft Foundry のエージェントで「音声モード」を有効にすると統合されるサービスはどれですか?",o:["Azure Speech Voice Live","Azure Content Understanding","Azure Translator"],c:0,e:"音声モードを有効にすると Azure Speech Voice Live が統合され、エージェントに話し言葉での対話機能が追加されます。"},
 // 第5章
 {id:"q5-01",ch:5,q:"コンピュータービジョンは、画像内のどのような種類の値の操作と分析に基づいていますか?",o:["写真メタデータのタイムスタンプ","ピクセル","画像ファイル名"],c:1,e:"コンピュータービジョンは、画像を構成するピクセルの値を操作・分析することに基づいています。"},
 {id:"q5-02",ch:5,q:"画像分類に使用される畳み込みニューラルネットワーク (CNN) におけるフィルターの主な役割は何ですか?",o:["視覚効果を適用して画像の外観を充実させる。","ニューラルネットワークで使用するために画像から数値的特徴を抽出する。","処理を高速化するために画像サイズを圧縮する。"],c:1,e:"CNNのフィルターは、画像から数値的な「特徴」を抽出し、ニューラルネットワークでの分類に利用します。"},
@@ -794,6 +824,7 @@ var QUIZ = [
 {id:"q5-07",ch:5,q:"画像内のすべてのピクセル単位でどこに何が写っているかを検出するタスクを何と呼びますか?",o:["オブジェクトの検出","セマンティックセグメンテーション","画像の分類"],c:1,e:"セマンティックセグメンテーションは、画像内のすべてのピクセル単位でどこに何が写っているかを検出するタスクです。"},
 {id:"q5-08",ch:5,q:"拡散モデル (Diffusion Model) の仕組みとして正しいものはどれですか?",o:["データにノイズを加える過程とノイズを取り除く過程を学習し、ノイズ除去を逆に行うことで画像を生成する","単語の出現頻度をベクトル化して文書の類似度を測る","音声波形をテキストに変換する統計モデル"],c:0,e:"拡散モデルは、画像にノイズを加える過程とそれを取り除く過程を学習し、ランダムなノイズから逆に画像を生成します。"},
 {id:"q5-09",ch:5,q:"CNN (畳み込みニューラルネットワーク) が持つ「物体が画像のどの位置にあっても特徴を抽出しやすい」性質を何と呼びますか?",o:["移動不変性","位置エンコーディング","自己注意機構"],c:0,e:"移動不変性は、局所的な特徴を走査するフィルター処理により、物体が画像のどこにあっても特徴を抽出しやすい性質です。"},
+{id:"q5-10",ch:5,q:"OpenAI Responses API でテキストと画像を1つのプロンプトにまとめて送信する際、画像を指定するために使用する type はどれですか?",o:["input_image","input_text","image_url_only"],c:0,e:"テキスト部分には\"type\": \"input_text\"、画像部分には\"type\": \"input_image\"を指定し、両方を1つの入力配列に含めることでマルチモーダルな問い合わせができます。"},
 // 第6章
 {id:"q6-01",ch:6,q:"AI情報抽出を正確に定義する次の記述のうちどれですか?",o:["SQLコードを使用してデータベースをクエリします。","クラウドストレージからローカルディスクにファイルをコピーします。","非構造化コンテンツを分析して、関連するフィールドと値を識別して抽出します。"],c:2,e:"AI情報抽出は、請求書や契約書などの非構造化コンテンツを分析し、関連するフィールドと値を識別・抽出して構造化データに変換します。"},
 {id:"q6-02",ch:6,q:"生成AIはデータ抽出プロセスをどのように強化するのでしょうか?",o:["セマンティック言語モデルを使用して、抽出された値をデータフィールドに正確に一致させます。","各ドキュメントタイプごとに抽出ルールを手動でコーディングします。","新しいドキュメントを最初から生成します。"],c:0,e:"生成AIはセマンティック言語モデルを活用し、フィールドの検出やマッピングを柔軟かつ高精度に行えるようにします。"},
@@ -801,7 +832,9 @@ var QUIZ = [
 {id:"q6-04",ch:6,q:"Azure Content Understandingにおけるアナライザーの主な役割は何ですか?",o:["コンテンツがどのように処理され、どのような構造化データが返されるかを定義します。","抽出したデータをデータベースに保存します。","JSON出力を人間が読めるテキストに変換します。"],c:0,e:"アナライザーは、スキーマに基づきコンテンツがどのように処理され、どのような構造化データを返すかを定義する機能です。"},
 {id:"q6-05",ch:6,q:"OCR (光学文字認識) の説明として最も適切なものはどれですか?",o:["画像や紙の文書に写った文字をコンピューターが読み取り、デジタルな文字データへ変換する技術","音声をリアルタイムで別の言語に翻訳する技術","画像の中の物体をピクセル単位で分類する技術"],c:0,e:"OCRは画像や紙文書の文字を読み取り、デジタルな文字データに変換する技術です。"},
 {id:"q6-06",ch:6,q:"Azure Content Understandingにおいて、抽出したいフィールドと構造を定義するものを何と呼びますか?",o:["エンドポイント","スキーマ","トークン"],c:1,e:"スキーマは、Content Understandingで抽出したいフィールドと構造をあらかじめ定義するものです。"},
-{id:"q6-07",ch:6,q:"OCRパイプラインの一般的な処理順序として正しいものはどれですか?",o:["画像の取得と入力 → 前処理とイメージの強化 → テキスト領域の検出 → 文字認識と分類 → 出力生成と後処理","出力生成と後処理 → 文字認識と分類 → 画像の取得と入力","テキスト領域の検出 → 画像の取得と入力 → 出力生成と後処理"],c:0,e:"OCRパイプラインは、画像取得 → 前処理 → テキスト領域検出 → 文字認識 → 出力生成の順に進みます。"}
+{id:"q6-07",ch:6,q:"OCRパイプラインの一般的な処理順序として正しいものはどれですか?",o:["画像の取得と入力 → 前処理とイメージの強化 → テキスト領域の検出 → 文字認識と分類 → 出力生成と後処理","出力生成と後処理 → 文字認識と分類 → 画像の取得と入力","テキスト領域の検出 → 画像の取得と入力 → 出力生成と後処理"],c:0,e:"OCRパイプラインは、画像取得 → 前処理 → テキスト領域検出 → 文字認識 → 出力生成の順に進みます。"},
+{id:"q6-08",ch:6,q:"Microsoft Foundry の Content Understanding で請求書アナライザーを使用するために必要な、2種類のモデルデプロイの組み合わせはどれですか?",o:["チャット補完モデルと埋め込みモデル","音声認識モデルと音声合成モデル","分類モデルとOCR専用モデル"],c:0,e:"請求書アナライザーの利用には、チャット補完モデル (フィールドの解釈) と埋め込みモデル (テキストのベクトル化) の両方のデプロイが必要です。"},
+{id:"q6-09",ch:6,q:"Content Understanding の解析結果画面で、抽出された各フィールドの横に表示されるパーセンテージは何を示していますか?",o:["抽出結果の信頼度スコア","処理にかかった時間の割合","元ファイルの圧縮率"],c:0,e:"各フィールドの横のパーセンテージは、そのフィールドの抽出結果に対する信頼度 (確信度) スコアを示します。"}
 ];
 
 /* ============================================================
@@ -979,6 +1012,13 @@ function renderCard(){
 
   var flashcard = document.getElementById("flashcard");
   flashcard.classList.toggle("flipped", flashState.flipped);
+
+  var cardStatus = state.cards[card.id];
+  flashcard.classList.toggle("status-mastered", cardStatus==="mastered");
+  flashcard.classList.toggle("status-review", cardStatus==="review");
+  document.getElementById("fc-mark-review").classList.toggle("is-active", cardStatus==="review");
+  document.getElementById("fc-mark-mastered").classList.toggle("is-active", cardStatus==="mastered");
+  document.getElementById("fc-reset").disabled = !cardStatus;
 }
 function flip(){ flashState.flipped = !flashState.flipped; document.getElementById("flashcard").classList.toggle("flipped", flashState.flipped); }
 function nextCard(){
@@ -1008,6 +1048,13 @@ document.getElementById("fc-prev").addEventListener("click", prevCard);
 document.getElementById("fc-shuffle").addEventListener("click", function(){ flashState.deck = shuffle(flashState.deck); flashState.index=0; flashState.flipped=false; renderCard(); });
 document.getElementById("fc-mark-review").addEventListener("click", function(){ markCard("review"); });
 document.getElementById("fc-mark-mastered").addEventListener("click", function(){ markCard("mastered"); });
+document.getElementById("fc-reset").addEventListener("click", function(){
+  if(flashState.deck.length===0) return;
+  var card = flashState.deck[flashState.index];
+  delete state.cards[card.id];
+  saveState();
+  renderCard();
+});
 document.addEventListener("keydown", function(e){
   if(currentView!=="flash") return;
   if(e.key==="ArrowRight") nextCard();
