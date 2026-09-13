@@ -308,7 +308,16 @@ a{color:var(--accent);}
 .btn-primary:hover{background:var(--accent-strong);}
 .btn-ghost{background:var(--surface); border-color:var(--border); color:var(--text);}
 .btn-ghost:hover{border-color:var(--accent); color:var(--accent);}
+.btn-danger{background:var(--danger); color:#fff;}
+.btn-danger:hover{filter:brightness(0.94);}
 .btn-row{display:flex; gap:10px; flex-wrap:wrap;}
+.wrong-review-box{
+  display:flex; align-items:center; justify-content:space-between; gap:14px; flex-wrap:wrap;
+  background:var(--danger-soft); border-radius:14px; padding:16px 18px; margin-bottom:20px;
+}
+.wrong-review-title{font-weight:800; font-size:14.5px; color:var(--danger);}
+.wrong-review-sub{font-size:12.5px; color:var(--text-muted); margin-top:2px;}
+.data-panel-note{margin:0 0 14px; font-size:13px; color:var(--text-muted); line-height:1.6;}
 .btn:disabled{opacity:.45; cursor:not-allowed;}
 
 /* ============ FLASHCARDS ============ */
@@ -466,11 +475,9 @@ a{color:var(--accent);}
 /* ============ Bottom tab bar (mobile) ============ */
 .tabbar{
   display:none;
-  position:fixed; bottom:0; left:0; right:0;
   background:var(--surface);
   border-top:1px solid var(--border);
   padding:6px 4px calc(6px + env(safe-area-inset-bottom));
-  z-index:20;
 }
 .tabbar-row{display:flex;}
 .tabbar .nav-item{
@@ -478,9 +485,10 @@ a{color:var(--accent);}
 }
 
 @media (max-width: 860px){
+  #app{flex-direction:column;}
   .sidebar{display:none;}
   .tabbar{display:block;}
-  .main{padding:22px 16px 90px;}
+  .main{padding:22px 16px 26px;}
   .stat-row{grid-template-columns:repeat(2,1fr);}
   .chapter-grid{grid-template-columns:1fr;}
   .cb-row .cb-name{width:96px; font-size:12px;}
@@ -585,6 +593,7 @@ a{color:var(--accent);}
       </div>
 
       <div id="quiz-setup" class="quiz-setup panel">
+        <div id="quiz-wrong-panel"></div>
         <div class="setup-label">章を選択</div>
         <div class="pill-row" id="quiz-chapter-pills"></div>
         <div class="btn-row">
@@ -631,6 +640,28 @@ a{color:var(--accent);}
       <div class="pill-row" id="gloss-chapter-pills"></div>
       <div id="gloss-list"></div>
     </section>
+
+    <!-- ===== SETTINGS ===== -->
+    <section class="view" id="view-settings" hidden>
+      <div class="page-head">
+        <span class="eyebrow">Settings</span>
+        <h1>管理</h1>
+        <p>クラウド同期とデータのバックアップは、ここでまとめて操作します。</p>
+      </div>
+
+      <div class="setup-label">クラウド同期 (Firebase)</div>
+      <div class="panel" id="cloud-panel"></div>
+
+      <div class="setup-label">進捗データ</div>
+      <div class="panel data-panel">
+        <p class="data-panel-note">進捗はこの端末のブラウザだけに保存されています。別の端末やブラウザでも続きから学習したい場合は、ここで書き出し・読み込みができます。</p>
+        <div class="btn-row">
+          <button class="btn btn-ghost" id="data-export-btn">進捗を書き出す</button>
+          <button class="btn btn-ghost" id="data-import-btn">進捗を読み込む</button>
+          <input type="file" id="data-import-file" accept="application/json" hidden>
+        </div>
+      </div>
+    </section>
   </main>
 
   <!-- ===== Mobile tab bar ===== -->
@@ -651,7 +682,8 @@ var NAV = [
   {id:"flash", label:"カード", icon:'<rect x="3" y="6" width="14" height="10" rx="2"/><path d="M7 3h14v10"/>'},
   {id:"quiz", label:"クイズ", icon:'<circle cx="12" cy="12" r="9"/><path d="M9.5 9a2.5 2.5 0 0 1 5 0c0 1.7-2.5 2-2.5 4"/><circle cx="12" cy="17" r=".6" fill="currentColor" stroke="none"/>'},
   {id:"exam", label:"模擬試験", icon:'<circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 3"/>'},
-  {id:"glossary", label:"用語集", icon:'<path d="M5 4h11a2 2 0 0 1 2 2v14l-6-3-6 3V6a2 2 0 0 1 2-2z"/><path d="M9 8h6M9 11h6"/>'}
+  {id:"glossary", label:"用語集", icon:'<path d="M5 4h11a2 2 0 0 1 2 2v14l-6-3-6 3V6a2 2 0 0 1 2-2z"/><path d="M9 8h6M9 11h6"/>'},
+  {id:"settings", label:"管理", icon:'<circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/>'}
 ];
 
 /* ============================================================
@@ -853,15 +885,185 @@ function loadState(){
     var raw = localStorage.getItem(STORE_KEY);
     if(raw) return JSON.parse(raw);
   }catch(e){}
-  return {cards:{}, quizHistory:{}, examHistory:[]};
+  return {cards:{}, quizHistory:{}, examHistory:[], wrongIds:{}};
 }
 function saveState(){
   try{ localStorage.setItem(STORE_KEY, JSON.stringify(state)); }catch(e){}
+  scheduleCloudPush();
 }
 var state = loadState();
 if(!state.cards) state.cards = {};
 if(!state.quizHistory) state.quizHistory = {};
 if(!state.examHistory) state.examHistory = [];
+if(!state.wrongIds) state.wrongIds = {};
+
+/* ============================================================
+   CLOUD SYNC (Firebase Auth + Firestore, optional)
+   ============================================================ */
+var FB_CONFIG_KEY = "ai901_firebase_config_v1";
+var FIREBASE_SDK_VERSION = "10.14.1";
+var fbApp = null, fbAuth = null, fbDb = null, fbUser = null, fbLastSynced = null, fbSyncTimer = null;
+var fbLoadPromise = null;
+
+function loadScriptTag(src){
+  return new Promise(function(resolve, reject){
+    var s = document.createElement("script");
+    s.src = src;
+    s.onload = function(){ resolve(); };
+    s.onerror = function(){ reject(new Error("スクリプトを読み込めませんでした: "+src)); };
+    document.head.appendChild(s);
+  });
+}
+function ensureFirebaseSdkLoaded(){
+  if(fbLoadPromise) return fbLoadPromise;
+  var base = "https://www.gstatic.com/firebasejs/"+FIREBASE_SDK_VERSION+"/";
+  fbLoadPromise = loadScriptTag(base+"firebase-app-compat.js")
+    .then(function(){ return loadScriptTag(base+"firebase-auth-compat.js"); })
+    .then(function(){ return loadScriptTag(base+"firebase-firestore-compat.js"); });
+  return fbLoadPromise;
+}
+function loadFirebaseConfigFromStorage(){
+  try{
+    var raw = localStorage.getItem(FB_CONFIG_KEY);
+    return raw ? JSON.parse(raw) : null;
+  }catch(e){ return null; }
+}
+function extractFirebaseConfig(text){
+  var match = text.match(/\{[\s\S]*\}/);
+  if(!match) throw new Error("設定オブジェクトが見つかりません");
+  var obj = new Function("return (" + match[0] + ")")();
+  if(!obj || !obj.apiKey || !obj.projectId) throw new Error("apiKey / projectId が見つかりません");
+  return obj;
+}
+function initFirebase(config){
+  return ensureFirebaseSdkLoaded().then(function(){
+    if(!fbApp){
+      fbApp = firebase.initializeApp(config);
+      fbAuth = firebase.auth();
+      fbDb = firebase.firestore();
+      fbAuth.onAuthStateChanged(function(user){
+        fbUser = user;
+        renderCloudPanel();
+        if(user) pullOrPushOnSignIn();
+      });
+    }
+    renderCloudPanel();
+  });
+}
+function saveFirebaseConfigAndInit(config){
+  try{ localStorage.setItem(FB_CONFIG_KEY, JSON.stringify(config)); }catch(e){}
+  initFirebase(config).catch(function(err){
+    alert("Firebaseの初期化に失敗しました。設定内容を確認してください。\n"+err.message);
+  });
+}
+function firebaseSignIn(){
+  if(!fbAuth) return;
+  var provider = new firebase.auth.GoogleAuthProvider();
+  fbAuth.signInWithPopup(provider).catch(function(err){
+    alert("ログインに失敗しました。\n"+err.message);
+  });
+}
+function firebaseSignOut(){
+  if(fbAuth) fbAuth.signOut();
+}
+function cloudDocRef(){
+  return fbDb.collection("progress").doc(fbUser.uid);
+}
+function pullOrPushOnSignIn(){
+  if(!fbUser || !fbDb) return;
+  cloudDocRef().get().then(function(doc){
+    if(doc.exists){
+      var remote = doc.data() || {};
+      var useCloud = confirm(
+        "クラウドに保存済みの学習データが見つかりました。\n\n"+
+        "[OK] クラウドのデータを使う (この端末の記録は上書きされます)\n"+
+        "[キャンセル] この端末のデータをクラウドにアップロードする (クラウドの記録は上書きされます)"
+      );
+      if(useCloud){
+        state = {
+          cards: remote.cards || {},
+          quizHistory: remote.quizHistory || {},
+          examHistory: remote.examHistory || [],
+          wrongIds: remote.wrongIds || {}
+        };
+        try{ localStorage.setItem(STORE_KEY, JSON.stringify(state)); }catch(e){}
+        refreshAllViews();
+        fbLastSynced = new Date();
+        renderCloudPanel();
+      }else{
+        pushToCloud();
+      }
+    }else{
+      pushToCloud();
+    }
+  }).catch(function(err){
+    alert("クラウドとの同期に失敗しました。\n"+err.message);
+  });
+}
+function pushToCloud(){
+  if(!fbUser || !fbDb) return;
+  cloudDocRef().set({
+    cards: state.cards,
+    quizHistory: state.quizHistory,
+    examHistory: state.examHistory,
+    wrongIds: state.wrongIds,
+    updatedAt: firebase.firestore.FieldValue.serverTimestamp()
+  }).then(function(){
+    fbLastSynced = new Date();
+    renderCloudPanel();
+  }).catch(function(err){
+    console.error("cloud push failed", err);
+  });
+}
+function scheduleCloudPush(){
+  if(!fbUser || !fbDb) return;
+  clearTimeout(fbSyncTimer);
+  fbSyncTimer = setTimeout(pushToCloud, 900);
+}
+function renderCloudPanel(){
+  var panel = document.getElementById("cloud-panel");
+  if(!panel) return;
+  var cfg = loadFirebaseConfigFromStorage();
+  if(!cfg){
+    panel.innerHTML =
+      '<p class="data-panel-note">Firebase を設定すると、Google アカウントでログインするだけで複数の端末・ブラウザ間で学習の進捗を自動的に同期できます。'+
+      'Firebase コンソールで作成した設定 (firebaseConfig) をそのまま下に貼り付けてください。</p>'+
+      '<textarea id="fb-config-input" rows="6" placeholder="const firebaseConfig = { apiKey: &quot;...&quot;, authDomain: &quot;...&quot;, projectId: &quot;...&quot; };" style="width:100%;box-sizing:border-box;font-family:\'JetBrains Mono\',monospace;font-size:12px;padding:10px;border-radius:10px;border:1px solid var(--border);background:var(--surface-2);color:var(--text);"></textarea>'+
+      '<div class="btn-row" style="margin-top:12px;"><button class="btn btn-primary" id="fb-config-save">設定を保存して同期を有効にする</button></div>';
+    document.getElementById("fb-config-save").addEventListener("click", function(){
+      var raw = document.getElementById("fb-config-input").value;
+      try{
+        var cfgObj = extractFirebaseConfig(raw);
+        saveFirebaseConfigAndInit(cfgObj);
+      }catch(e){
+        alert("設定の読み取りに失敗しました。Firebase コンソールに表示される firebaseConfig をそのまま貼り付けてください。");
+      }
+    });
+    return;
+  }
+  if(!fbUser){
+    panel.innerHTML =
+      '<p class="data-panel-note">Firebase の設定は保存済みです。Google アカウントでログインすると、この端末の進捗をクラウドと同期できます。</p>'+
+      '<div class="btn-row"><button class="btn btn-primary" id="fb-signin-btn">Google でログインして同期</button>'+
+      '<button class="btn btn-ghost" id="fb-config-clear">設定を削除</button></div>';
+    document.getElementById("fb-signin-btn").addEventListener("click", firebaseSignIn);
+    document.getElementById("fb-config-clear").addEventListener("click", function(){
+      if(confirm("保存した Firebase の設定を削除します。よろしいですか?")){
+        try{ localStorage.removeItem(FB_CONFIG_KEY); }catch(e){}
+        location.reload();
+      }
+    });
+    return;
+  }
+  var lastText = fbLastSynced ? ("最終同期: "+fbLastSynced.toLocaleString("ja-JP")) : "同期待ち…";
+  panel.innerHTML =
+    '<p class="data-panel-note">'+(fbUser.email||"Google アカウント")+' としてログイン中。学習内容は自動的にクラウドに保存されます。</p>'+
+    '<p class="data-panel-note mono" style="margin-top:-10px;">'+lastText+'</p>'+
+    '<div class="btn-row"><button class="btn btn-ghost" id="fb-sync-now">今すぐ同期</button>'+
+    '<button class="btn btn-ghost" id="fb-signout-btn">ログアウト</button></div>';
+  document.getElementById("fb-sync-now").addEventListener("click", pullOrPushOnSignIn);
+  document.getElementById("fb-signout-btn").addEventListener("click", firebaseSignOut);
+}
 
 function chapterInfo(id){ for(var i=0;i<CHAPTERS.length;i++){ if(CHAPTERS[i].id===id) return CHAPTERS[i]; } return CHAPTERS[0]; }
 function cardsOf(ch){ return ch ? FLASHCARDS.filter(function(c){return c.ch===ch;}) : FLASHCARDS.slice(); }
@@ -896,7 +1098,7 @@ function renderNav(){
 }
 function goTo(view){
   currentView = view;
-  ["home","flash","quiz","exam","glossary"].forEach(function(v){
+  ["home","flash","quiz","exam","glossary","settings"].forEach(function(v){
     document.getElementById("view-"+v).hidden = (v!==view);
   });
   renderNav();
@@ -905,6 +1107,7 @@ function goTo(view){
   if(view==="quiz") renderQuizSetup();
   if(view==="exam") renderExamSetup();
   if(view==="glossary") renderGlossary();
+  if(view==="settings") renderCloudPanel();
   window.scrollTo({top:0,behavior:"instant"});
 }
 
@@ -957,6 +1160,66 @@ function renderHome(){
     grid.appendChild(card);
   });
 }
+
+/* ============================================================
+   PROGRESS BACKUP / RESTORE
+   ============================================================ */
+function exportProgress(){
+  try{
+    var data = JSON.stringify(state, null, 2);
+    var blob = new Blob([data], {type:"application/json"});
+    var url = URL.createObjectURL(blob);
+    var a = document.createElement("a");
+    var ts = new Date().toISOString().slice(0,10);
+    a.href = url;
+    a.download = "ai901_progress_"+ts+".json";
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    setTimeout(function(){ URL.revokeObjectURL(url); }, 1000);
+  }catch(e){
+    alert("書き出しに失敗しました。");
+  }
+}
+function importProgress(file){
+  var reader = new FileReader();
+  reader.onload = function(ev){
+    var parsed;
+    try{
+      parsed = JSON.parse(ev.target.result);
+      if(!parsed || typeof parsed !== "object") throw new Error("invalid");
+    }catch(e){
+      alert("読み込みに失敗しました。正しいバックアップファイルを選択してください。");
+      return;
+    }
+    if(!confirm("この端末に保存されている今の進捗を、読み込んだデータで上書きします。よろしいですか?")) return;
+    state = {
+      cards: parsed.cards || {},
+      quizHistory: parsed.quizHistory || {},
+      examHistory: parsed.examHistory || [],
+      wrongIds: parsed.wrongIds || {}
+    };
+    saveState();
+    refreshAllViews();
+    alert("進捗を読み込みました。");
+  };
+  reader.readAsText(file);
+}
+function refreshAllViews(){
+  renderHome();
+  renderFlashSetup();
+  renderQuizSetup();
+  renderExamSetup();
+}
+document.getElementById("data-export-btn").addEventListener("click", exportProgress);
+document.getElementById("data-import-btn").addEventListener("click", function(){
+  document.getElementById("data-import-file").click();
+});
+document.getElementById("data-import-file").addEventListener("change", function(e){
+  var file = e.target.files && e.target.files[0];
+  if(file) importProgress(file);
+  e.target.value = "";
+});
 
 /* ============================================================
    FLASHCARDS
@@ -1077,6 +1340,21 @@ function renderQuizSetup(){
   document.getElementById("quiz-setup").hidden = false;
   document.getElementById("quiz-play").hidden = true;
   document.getElementById("quiz-result").hidden = true;
+
+  var wrongIds = Object.keys(state.wrongIds||{}).filter(function(id){ return QUIZ.some(function(q){ return q.id===id; }); });
+  var wrongPanel = document.getElementById("quiz-wrong-panel");
+  if(wrongIds.length>0){
+    wrongPanel.innerHTML =
+      '<div class="wrong-review-box">'+
+        '<div><div class="wrong-review-title">苦手問題が '+wrongIds.length+' 問たまっています</div>'+
+        '<div class="wrong-review-sub">これまでのクイズ・模擬試験で間違えた問題だけを復習できます。</div></div>'+
+        '<button class="btn btn-danger" id="quiz-wrong-btn">苦手問題を復習する</button>'+
+      '</div>';
+    document.getElementById("quiz-wrong-btn").addEventListener("click", function(){ startQuiz("wrong"); });
+  }else{
+    wrongPanel.innerHTML = "";
+  }
+
   var pillRow = document.getElementById("quiz-chapter-pills");
   pillRow.innerHTML = "";
   CHAPTERS.forEach(function(ch){
@@ -1086,13 +1364,15 @@ function renderQuizSetup(){
       renderQuizSetup();
     }));
   });
-  if(quizState.chapter===0) quizState.chapter = CHAPTERS[0].id;
+  if(quizState.chapter===0 || quizState.chapter==="wrong") quizState.chapter = CHAPTERS[0].id;
 }
 document.getElementById("quiz-start-btn").addEventListener("click", function(){
   startQuiz(quizState.chapter);
 });
 function startQuiz(ch){
-  quizState.questions = shuffle(quizOf(ch));
+  quizState.chapter = ch;
+  var pool = (ch==="wrong") ? QUIZ.filter(function(q){ return !!state.wrongIds[q.id]; }) : quizOf(ch);
+  quizState.questions = shuffle(pool);
   quizState.index = 0;
   quizState.answers = [];
   quizState.locked = false;
@@ -1130,6 +1410,8 @@ function renderQuizQuestion(qs, containerId, onFinish){
       var chosen = parseInt(btn.getAttribute("data-i"),10);
       var correct = q.c;
       qs.answers.push({q:q, chosen:chosen, correct:correct});
+      if(chosen===correct){ delete state.wrongIds[q.id]; } else { state.wrongIds[q.id] = true; }
+      saveState();
       Array.prototype.forEach.call(container.querySelectorAll(".opt"), function(o, i){
         o.classList.add("disabled");
         if(i===correct) o.classList.add("correct");
@@ -1163,17 +1445,21 @@ function finishQuiz(quit){
   var correctCount = quizState.answers.filter(function(a){ return a.chosen===a.correct; }).length;
   var total = quit ? quizState.answers.length : quizState.questions.length;
   var percentage = pct(correctCount, total || 1);
+  var isWrongMode = quizState.chapter==="wrong";
 
-  var prev = state.quizHistory[quizState.chapter] || {best:0, attempts:0};
-  state.quizHistory[quizState.chapter] = {best: Math.max(prev.best, percentage), attempts: prev.attempts+1};
-  saveState();
+  if(!isWrongMode){
+    var prev = state.quizHistory[quizState.chapter] || {best:0, attempts:0};
+    state.quizHistory[quizState.chapter] = {best: Math.max(prev.best, percentage), attempts: prev.attempts+1};
+    saveState();
+  }
 
-  var msg = percentage>=80 ? "素晴らしい仕上がりです。この調子で他の章も進めましょう。" :
+  var msg = isWrongMode ? "正解した問題は苦手リストから外れます。残りはまた挑戦して克服しましょう。" :
+            percentage>=80 ? "素晴らしい仕上がりです。この調子で他の章も進めましょう。" :
             percentage>=50 ? "あと一歩。間違えた問題を復習して再挑戦しましょう。" :
             "フラッシュカードで基礎用語を復習してから、もう一度挑戦しましょう。";
 
   var html = '<div class="result-hero"><div class="result-score">'+percentage+'<span>%</span></div>';
-  html += '<div class="result-msg">'+correctCount+' / '+total+' 問正解 &middot; 第'+quizState.chapter+'章</div>';
+  html += '<div class="result-msg">'+correctCount+' / '+total+' 問正解 &middot; '+(isWrongMode ? "苦手問題の復習" : "第"+quizState.chapter+"章")+'</div>';
   html += '<div class="result-msg">'+msg+'</div></div>';
   html += '<div class="setup-label">解答の振り返り</div><div class="review-list">';
   quizState.answers.forEach(function(a){
@@ -1364,6 +1650,12 @@ renderHome();
 renderFlashSetup();
 renderQuizSetup();
 renderExamSetup();
+renderCloudPanel();
+
+var savedFbConfig = loadFirebaseConfigFromStorage();
+if(savedFbConfig){
+  initFirebase(savedFbConfig).catch(function(err){ console.error("firebase init failed", err); });
+}
 })();
 </script>
 </body>
