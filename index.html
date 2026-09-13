@@ -471,7 +471,21 @@ a{color:var(--accent);}
 .gloss-item:last-child{border-bottom:none;}
 .gloss-item dt{font-weight:700; font-size:14.5px; margin-bottom:4px;}
 .gloss-item dd{margin:0; font-size:13.5px; color:var(--text-muted);}
+.gloss-item.status-mastered dt{color:var(--success);}
+.gloss-item.status-review dt{color:var(--danger);}
 .empty-note{color:var(--text-faint); font-size:13.5px; padding:20px 0;}
+
+/* ============ Chapter context label ============ */
+.chapter-context{
+  font-size:14px; font-weight:800; color:var(--accent);
+  margin:-8px 0 18px;
+}
+.chapter-context .ctx-sub{color:var(--text-muted); font-weight:600; font-size:13px; margin-left:2px;}
+
+/* ============ Card/List segmented toggle ============ */
+.seg-toggle{display:inline-flex; gap:4px; background:var(--surface-2); padding:4px; border-radius:12px; margin-bottom:18px;}
+.seg-btn{border:none; background:none; padding:8px 18px; border-radius:9px; font-size:13.5px; font-weight:700; color:var(--text-muted); cursor:pointer; font-family:inherit;}
+.seg-btn.active{background:var(--surface); color:var(--accent); box-shadow:0 1px 4px rgba(0,0,0,.10);}
 
 /* ============ Bottom tab bar (mobile) ============ */
 .tabbar{
@@ -554,7 +568,12 @@ a{color:var(--accent);}
         <p>用語をタップして意味を確認し、習熟度を記録しましょう。</p>
       </div>
       <div class="pill-row" id="flash-chapter-pills"></div>
-      <div class="fc-wrap">
+      <div class="chapter-context" id="flash-chapter-title"></div>
+      <div class="seg-toggle" id="flash-mode-toggle">
+        <button class="seg-btn active" data-mode="card">カード</button>
+        <button class="seg-btn" data-mode="list">一覧(テキスト)</button>
+      </div>
+      <div class="fc-wrap" id="fc-wrap">
         <div class="fc-progress">
           <span class="mono" id="fc-count">0 / 0</span>
           <div class="progress-track"><div class="progress-fill" id="fc-progress-fill" style="width:0%"></div></div>
@@ -584,6 +603,9 @@ a{color:var(--accent);}
           <button class="iconbtn" id="fc-shuffle" title="シャッフル" aria-label="シャッフル"><svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M16 3h5v5M4 20L21 3M21 16v5h-5M15 15l6 6M4 4l5 5"/></svg></button>
         </div>
       </div>
+      <div id="fc-list-wrap" hidden>
+        <div id="fc-list"></div>
+      </div>
     </section>
 
     <!-- ===== CHAPTER QUIZ ===== -->
@@ -598,11 +620,13 @@ a{color:var(--accent);}
         <div id="quiz-wrong-panel"></div>
         <div class="setup-label">章を選択</div>
         <div class="pill-row" id="quiz-chapter-pills"></div>
+        <div class="chapter-context" id="quiz-chapter-title"></div>
         <div class="btn-row">
           <button class="btn btn-primary" id="quiz-start-btn">クイズを開始</button>
         </div>
       </div>
 
+      <div class="chapter-context" id="quiz-play-chapter-title" hidden></div>
       <div id="quiz-play" hidden></div>
       <div id="quiz-result" hidden></div>
     </section>
@@ -1048,6 +1072,13 @@ function renderCloudPanel(){
 }
 
 function chapterInfo(id){ for(var i=0;i<CHAPTERS.length;i++){ if(CHAPTERS[i].id===id) return CHAPTERS[i]; } return CHAPTERS[0]; }
+function chapterContextHTML(chId, count, unitLabel){
+  if(chId===0 || chId==="wrong"){
+    return "全章 <span class=\"ctx-sub\">(全"+count+unitLabel+")</span>";
+  }
+  var ch = chapterInfo(chId);
+  return "第"+ch.id+"章 &middot; "+ch.title+" <span class=\"ctx-sub\">("+count+unitLabel+")</span>";
+}
 function cardsOf(ch){ return ch ? FLASHCARDS.filter(function(c){return c.ch===ch;}) : FLASHCARDS.slice(); }
 function quizOf(ch){ return ch ? QUIZ.filter(function(q){return q.ch===ch;}) : QUIZ.slice(); }
 function shuffle(arr){
@@ -1206,7 +1237,7 @@ document.getElementById("data-import-file").addEventListener("change", function(
 /* ============================================================
    FLASHCARDS
    ============================================================ */
-var flashState = {chapter:0, deck:[], index:0, flipped:false};
+var flashState = {chapter:0, deck:[], index:0, flipped:false, mode:"card"};
 
 function renderFlashSetup(){
   var pillRow = document.getElementById("flash-chapter-pills");
@@ -1230,7 +1261,9 @@ function buildDeck(){
   flashState.index = 0;
   flashState.flipped = false;
   renderFlashSetup_pillsOnly();
+  document.getElementById("flash-chapter-title").innerHTML = chapterContextHTML(flashState.chapter, flashState.deck.length, "語");
   renderCard();
+  renderFlashList();
 }
 function renderFlashSetup_pillsOnly(){
   var pillRow = document.getElementById("flash-chapter-pills");
@@ -1238,6 +1271,42 @@ function renderFlashSetup_pillsOnly(){
     var isAll = i===0;
     var active = isAll ? flashState.chapter===0 : flashState.chapter===CHAPTERS[i-1].id;
     el.classList.toggle("active", active);
+  });
+}
+function setFlashMode(mode){
+  flashState.mode = mode;
+  Array.prototype.forEach.call(document.querySelectorAll("#flash-mode-toggle .seg-btn"), function(btn){
+    btn.classList.toggle("active", btn.getAttribute("data-mode")===mode);
+  });
+  document.getElementById("fc-wrap").hidden = (mode!=="card");
+  document.getElementById("fc-list-wrap").hidden = (mode!=="list");
+}
+Array.prototype.forEach.call(document.querySelectorAll("#flash-mode-toggle .seg-btn"), function(btn){
+  btn.addEventListener("click", function(){ setFlashMode(btn.getAttribute("data-mode")); });
+});
+function renderFlashList(){
+  var list = document.getElementById("fc-list");
+  list.innerHTML = "";
+  var chapters = flashState.chapter===0 ? CHAPTERS : CHAPTERS.filter(function(c){ return c.id===flashState.chapter; });
+  chapters.forEach(function(ch){
+    var items = cardsOf(ch.id);
+    if(items.length===0) return;
+    var group = document.createElement("div");
+    group.className = "gloss-group";
+    group.style.setProperty("--gc", ch.color);
+    var h = document.createElement("h3");
+    h.innerHTML = "第"+ch.id+"章 &middot; " + ch.title;
+    group.appendChild(h);
+    var dl = document.createElement("dl");
+    items.forEach(function(c){
+      var status = state.cards[c.id];
+      var item = document.createElement("div");
+      item.className = "gloss-item" + (status ? " status-"+status : "");
+      item.innerHTML = '<dt>'+c.term+'</dt><dd>'+c.def+'</dd>';
+      dl.appendChild(item);
+    });
+    group.appendChild(dl);
+    list.appendChild(group);
   });
 }
 function renderCard(){
@@ -1293,6 +1362,7 @@ function markCard(status){
   state.cards[card.id] = status;
   saveState();
   renderCard();
+  renderFlashList();
   setTimeout(nextCard, 260);
 }
 document.getElementById("flashcard").addEventListener("click", flip);
@@ -1308,6 +1378,7 @@ document.getElementById("fc-reset").addEventListener("click", function(){
   delete state.cards[card.id];
   saveState();
   renderCard();
+  renderFlashList();
 });
 document.addEventListener("keydown", function(e){
   if(currentView!=="flash") return;
@@ -1324,6 +1395,7 @@ function renderQuizSetup(){
   document.getElementById("quiz-setup").hidden = false;
   document.getElementById("quiz-play").hidden = true;
   document.getElementById("quiz-result").hidden = true;
+  document.getElementById("quiz-play-chapter-title").hidden = true;
 
   var wrongIds = Object.keys(state.wrongIds||{}).filter(function(id){ return QUIZ.some(function(q){ return q.id===id; }); });
   var wrongPanel = document.getElementById("quiz-wrong-panel");
@@ -1349,6 +1421,7 @@ function renderQuizSetup(){
     }));
   });
   if(quizState.chapter===0 || quizState.chapter==="wrong") quizState.chapter = CHAPTERS[0].id;
+  document.getElementById("quiz-chapter-title").innerHTML = chapterContextHTML(quizState.chapter, quizOf(quizState.chapter).length, "問");
 }
 document.getElementById("quiz-start-btn").addEventListener("click", function(){
   startQuiz(quizState.chapter);
@@ -1363,6 +1436,14 @@ function startQuiz(ch){
   document.getElementById("quiz-setup").hidden = true;
   document.getElementById("quiz-result").hidden = true;
   document.getElementById("quiz-play").hidden = false;
+  var playTitle = document.getElementById("quiz-play-chapter-title");
+  if(ch==="wrong"){
+    playTitle.innerHTML = "苦手問題の復習 <span class=\"ctx-sub\">("+pool.length+"問)</span>";
+    playTitle.hidden = false;
+  }else{
+    playTitle.innerHTML = chapterContextHTML(ch, pool.length, "問");
+    playTitle.hidden = false;
+  }
   renderQuizQuestion(quizState, "quiz-play", function(){ finishQuiz(); });
 }
 function renderQuizQuestion(qs, containerId, onFinish){
@@ -1424,6 +1505,7 @@ function renderQuizQuestion(qs, containerId, onFinish){
 }
 function finishQuiz(quit){
   document.getElementById("quiz-play").hidden = true;
+  document.getElementById("quiz-play-chapter-title").hidden = true;
   var result = document.getElementById("quiz-result");
   result.hidden = false;
   var correctCount = quizState.answers.filter(function(a){ return a.chosen===a.correct; }).length;
