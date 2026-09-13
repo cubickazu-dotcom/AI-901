@@ -898,12 +898,20 @@ if(!state.examHistory) state.examHistory = [];
 if(!state.wrongIds) state.wrongIds = {};
 
 /* ============================================================
-   CLOUD SYNC (Firebase Auth + Firestore, optional)
+   CLOUD SYNC (Firebase Auth + Firestore)
    ============================================================ */
-var FB_CONFIG_KEY = "ai901_firebase_config_v1";
+var FIREBASE_CONFIG = {
+  apiKey: "AIzaSyA2r7QRygB1jtOp-kwrRTh8R5zKrYFs5II",
+  authDomain: "ai901-study.firebaseapp.com",
+  projectId: "ai901-study",
+  storageBucket: "ai901-study.firebasestorage.app",
+  messagingSenderId: "508949528301",
+  appId: "1:508949528301:web:54c85440f9c2f24f8456e4",
+  measurementId: "G-8EGKC4JD1W"
+};
 var FIREBASE_SDK_VERSION = "10.14.1";
 var fbApp = null, fbAuth = null, fbDb = null, fbUser = null, fbLastSynced = null, fbSyncTimer = null;
-var fbLoadPromise = null;
+var fbLoadPromise = null, fbInitError = null;
 
 function loadScriptTag(src){
   return new Promise(function(resolve, reject){
@@ -922,23 +930,10 @@ function ensureFirebaseSdkLoaded(){
     .then(function(){ return loadScriptTag(base+"firebase-firestore-compat.js"); });
   return fbLoadPromise;
 }
-function loadFirebaseConfigFromStorage(){
-  try{
-    var raw = localStorage.getItem(FB_CONFIG_KEY);
-    return raw ? JSON.parse(raw) : null;
-  }catch(e){ return null; }
-}
-function extractFirebaseConfig(text){
-  var match = text.match(/\{[\s\S]*\}/);
-  if(!match) throw new Error("設定オブジェクトが見つかりません");
-  var obj = new Function("return (" + match[0] + ")")();
-  if(!obj || !obj.apiKey || !obj.projectId) throw new Error("apiKey / projectId が見つかりません");
-  return obj;
-}
-function initFirebase(config){
+function initFirebase(){
   return ensureFirebaseSdkLoaded().then(function(){
     if(!fbApp){
-      fbApp = firebase.initializeApp(config);
+      fbApp = firebase.initializeApp(FIREBASE_CONFIG);
       fbAuth = firebase.auth();
       fbDb = firebase.firestore();
       fbAuth.onAuthStateChanged(function(user){
@@ -948,19 +943,22 @@ function initFirebase(config){
       });
     }
     renderCloudPanel();
-  });
-}
-function saveFirebaseConfigAndInit(config){
-  try{ localStorage.setItem(FB_CONFIG_KEY, JSON.stringify(config)); }catch(e){}
-  initFirebase(config).catch(function(err){
-    alert("Firebaseの初期化に失敗しました。設定内容を確認してください。\n"+err.message);
+  }).catch(function(err){
+    fbInitError = err;
+    renderCloudPanel();
   });
 }
 function firebaseSignIn(){
-  if(!fbAuth) return;
-  var provider = new firebase.auth.GoogleAuthProvider();
-  fbAuth.signInWithPopup(provider).catch(function(err){
-    alert("ログインに失敗しました。\n"+err.message);
+  var run = fbAuth ? Promise.resolve() : initFirebase();
+  run.then(function(){
+    if(!fbAuth){
+      alert("Firebaseの読み込みに失敗しました。通信状況を確認して、ページを再読み込みしてください。");
+      return;
+    }
+    var provider = new firebase.auth.GoogleAuthProvider();
+    fbAuth.signInWithPopup(provider).catch(function(err){
+      alert("ログインに失敗しました。\n"+err.message);
+    });
   });
 }
 function firebaseSignOut(){
@@ -1023,36 +1021,18 @@ function scheduleCloudPush(){
 function renderCloudPanel(){
   var panel = document.getElementById("cloud-panel");
   if(!panel) return;
-  var cfg = loadFirebaseConfigFromStorage();
-  if(!cfg){
+  if(fbInitError){
     panel.innerHTML =
-      '<p class="data-panel-note">Firebase を設定すると、Google アカウントでログインするだけで複数の端末・ブラウザ間で学習の進捗を自動的に同期できます。'+
-      'Firebase コンソールで作成した設定 (firebaseConfig) をそのまま下に貼り付けてください。</p>'+
-      '<textarea id="fb-config-input" rows="6" placeholder="const firebaseConfig = { apiKey: &quot;...&quot;, authDomain: &quot;...&quot;, projectId: &quot;...&quot; };" style="width:100%;box-sizing:border-box;font-family:\'JetBrains Mono\',monospace;font-size:12px;padding:10px;border-radius:10px;border:1px solid var(--border);background:var(--surface-2);color:var(--text);"></textarea>'+
-      '<div class="btn-row" style="margin-top:12px;"><button class="btn btn-primary" id="fb-config-save">設定を保存して同期を有効にする</button></div>';
-    document.getElementById("fb-config-save").addEventListener("click", function(){
-      var raw = document.getElementById("fb-config-input").value;
-      try{
-        var cfgObj = extractFirebaseConfig(raw);
-        saveFirebaseConfigAndInit(cfgObj);
-      }catch(e){
-        alert("設定の読み取りに失敗しました。Firebase コンソールに表示される firebaseConfig をそのまま貼り付けてください。");
-      }
-    });
+      '<p class="data-panel-note">クラウド同期の読み込みに失敗しました。通信状況を確認して、ページを再読み込みしてください。</p>'+
+      '<div class="btn-row"><button class="btn btn-ghost" id="fb-retry-btn">再読み込み</button></div>';
+    document.getElementById("fb-retry-btn").addEventListener("click", function(){ location.reload(); });
     return;
   }
   if(!fbUser){
     panel.innerHTML =
-      '<p class="data-panel-note">Firebase の設定は保存済みです。Google アカウントでログインすると、この端末の進捗をクラウドと同期できます。</p>'+
-      '<div class="btn-row"><button class="btn btn-primary" id="fb-signin-btn">Google でログインして同期</button>'+
-      '<button class="btn btn-ghost" id="fb-config-clear">設定を削除</button></div>';
+      '<p class="data-panel-note">Google アカウントでログインすると、この端末の進捗をクラウドと同期できます。別の端末でも同じアカウントでログインするだけで、続きから学習できます。</p>'+
+      '<div class="btn-row"><button class="btn btn-primary" id="fb-signin-btn">Google でログインして同期</button></div>';
     document.getElementById("fb-signin-btn").addEventListener("click", firebaseSignIn);
-    document.getElementById("fb-config-clear").addEventListener("click", function(){
-      if(confirm("保存した Firebase の設定を削除します。よろしいですか?")){
-        try{ localStorage.removeItem(FB_CONFIG_KEY); }catch(e){}
-        location.reload();
-      }
-    });
     return;
   }
   var lastText = fbLastSynced ? ("最終同期: "+fbLastSynced.toLocaleString("ja-JP")) : "同期待ち…";
@@ -1651,11 +1631,7 @@ renderFlashSetup();
 renderQuizSetup();
 renderExamSetup();
 renderCloudPanel();
-
-var savedFbConfig = loadFirebaseConfigFromStorage();
-if(savedFbConfig){
-  initFirebase(savedFbConfig).catch(function(err){ console.error("firebase init failed", err); });
-}
+initFirebase();
 })();
 </script>
 </body>
