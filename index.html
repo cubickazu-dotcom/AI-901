@@ -371,7 +371,6 @@ a{color:var(--accent);}
 }
 .fc-hint{position:absolute; bottom:14px; font-size:11.5px; color:var(--text-faint);}
 .fc-term{font-size:26px; font-weight:900; font-family:"Zen Kaku Gothic New";}
-.fc-term-back{font-size:15.5px; font-weight:800; color:var(--accent); font-family:"Zen Kaku Gothic New";}
 .fc-def{font-size:16px; color:var(--text); max-width:440px;}
 .fc-controls{display:flex; gap:10px; align-items:center; flex-wrap:wrap; justify-content:center;}
 .iconbtn{
@@ -471,21 +470,7 @@ a{color:var(--accent);}
 .gloss-item:last-child{border-bottom:none;}
 .gloss-item dt{font-weight:700; font-size:14.5px; margin-bottom:4px;}
 .gloss-item dd{margin:0; font-size:13.5px; color:var(--text-muted);}
-.gloss-item.status-mastered dt{color:var(--success);}
-.gloss-item.status-review dt{color:var(--danger);}
 .empty-note{color:var(--text-faint); font-size:13.5px; padding:20px 0;}
-
-/* ============ Chapter context label ============ */
-.chapter-context{
-  font-size:14px; font-weight:800; color:var(--accent);
-  margin:-8px 0 18px;
-}
-.chapter-context .ctx-sub{color:var(--text-muted); font-weight:600; font-size:13px; margin-left:2px;}
-
-/* ============ Card/List segmented toggle ============ */
-.seg-toggle{display:inline-flex; gap:4px; background:var(--surface-2); padding:4px; border-radius:12px; margin-bottom:18px;}
-.seg-btn{border:none; background:none; padding:8px 18px; border-radius:9px; font-size:13.5px; font-weight:700; color:var(--text-muted); cursor:pointer; font-family:inherit;}
-.seg-btn.active{background:var(--surface); color:var(--accent); box-shadow:0 1px 4px rgba(0,0,0,.10);}
 
 /* ============ Bottom tab bar (mobile) ============ */
 .tabbar{
@@ -558,6 +543,19 @@ a{color:var(--accent);}
 
       <div class="setup-label">章から学習を始める</div>
       <div class="chapter-grid" id="chapter-grid"></div>
+
+      <div class="setup-label">クラウド同期 (Firebase)</div>
+      <div class="panel" id="cloud-panel"></div>
+
+      <div class="setup-label">進捗データ</div>
+      <div class="panel data-panel">
+        <p class="data-panel-note">進捗はこの端末のブラウザだけに保存されています。別の端末やブラウザでも続きから学習したい場合は、ここで書き出し・読み込みができます。</p>
+        <div class="btn-row">
+          <button class="btn btn-ghost" id="data-export-btn">進捗を書き出す</button>
+          <button class="btn btn-ghost" id="data-import-btn">進捗を読み込む</button>
+          <input type="file" id="data-import-file" accept="application/json" hidden>
+        </div>
+      </div>
     </section>
 
     <!-- ===== FLASHCARDS ===== -->
@@ -568,12 +566,7 @@ a{color:var(--accent);}
         <p>用語をタップして意味を確認し、習熟度を記録しましょう。</p>
       </div>
       <div class="pill-row" id="flash-chapter-pills"></div>
-      <div class="chapter-context" id="flash-chapter-title"></div>
-      <div class="seg-toggle" id="flash-mode-toggle">
-        <button class="seg-btn active" data-mode="card">カード</button>
-        <button class="seg-btn" data-mode="list">一覧(テキスト)</button>
-      </div>
-      <div class="fc-wrap" id="fc-wrap">
+      <div class="fc-wrap">
         <div class="fc-progress">
           <span class="mono" id="fc-count">0 / 0</span>
           <div class="progress-track"><div class="progress-fill" id="fc-progress-fill" style="width:0%"></div></div>
@@ -588,7 +581,6 @@ a{color:var(--accent);}
             </div>
             <div class="fc-face back">
               <span class="fc-tag" id="fc-tag-back">第1章</span>
-              <div class="fc-term-back" id="fc-term-back">…</div>
               <div class="fc-def" id="fc-def">…</div>
               <div class="fc-hint">タップしてもう一度</div>
             </div>
@@ -602,9 +594,6 @@ a{color:var(--accent);}
           <button class="iconbtn" id="fc-next" title="次へ" aria-label="次へ"><svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 18l6-6-6-6"/></svg></button>
           <button class="iconbtn" id="fc-shuffle" title="シャッフル" aria-label="シャッフル"><svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M16 3h5v5M4 20L21 3M21 16v5h-5M15 15l6 6M4 4l5 5"/></svg></button>
         </div>
-      </div>
-      <div id="fc-list-wrap" hidden>
-        <div id="fc-list"></div>
       </div>
     </section>
 
@@ -620,13 +609,11 @@ a{color:var(--accent);}
         <div id="quiz-wrong-panel"></div>
         <div class="setup-label">章を選択</div>
         <div class="pill-row" id="quiz-chapter-pills"></div>
-        <div class="chapter-context" id="quiz-chapter-title"></div>
         <div class="btn-row">
           <button class="btn btn-primary" id="quiz-start-btn">クイズを開始</button>
         </div>
       </div>
 
-      <div class="chapter-context" id="quiz-play-chapter-title" hidden></div>
       <div id="quiz-play" hidden></div>
       <div id="quiz-result" hidden></div>
     </section>
@@ -666,28 +653,6 @@ a{color:var(--accent);}
       <div class="pill-row" id="gloss-chapter-pills"></div>
       <div id="gloss-list"></div>
     </section>
-
-    <!-- ===== SETTINGS ===== -->
-    <section class="view" id="view-settings" hidden>
-      <div class="page-head">
-        <span class="eyebrow">Settings</span>
-        <h1>管理</h1>
-        <p>クラウド同期とデータのバックアップは、ここでまとめて操作します。</p>
-      </div>
-
-      <div class="setup-label">クラウド同期 (Firebase)</div>
-      <div class="panel" id="cloud-panel"></div>
-
-      <div class="setup-label">進捗データ</div>
-      <div class="panel data-panel">
-        <p class="data-panel-note">進捗はこの端末のブラウザだけに保存されています。別の端末やブラウザでも続きから学習したい場合は、ここで書き出し・読み込みができます。</p>
-        <div class="btn-row">
-          <button class="btn btn-ghost" id="data-export-btn">進捗を書き出す</button>
-          <button class="btn btn-ghost" id="data-import-btn">進捗を読み込む</button>
-          <input type="file" id="data-import-file" accept="application/json" hidden>
-        </div>
-      </div>
-    </section>
   </main>
 
   <!-- ===== Mobile tab bar ===== -->
@@ -708,8 +673,7 @@ var NAV = [
   {id:"flash", label:"カード", icon:'<rect x="3" y="6" width="14" height="10" rx="2"/><path d="M7 3h14v10"/>'},
   {id:"quiz", label:"クイズ", icon:'<circle cx="12" cy="12" r="9"/><path d="M9.5 9a2.5 2.5 0 0 1 5 0c0 1.7-2.5 2-2.5 4"/><circle cx="12" cy="17" r=".6" fill="currentColor" stroke="none"/>'},
   {id:"exam", label:"模擬試験", icon:'<circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 3"/>'},
-  {id:"glossary", label:"用語集", icon:'<path d="M5 4h11a2 2 0 0 1 2 2v14l-6-3-6 3V6a2 2 0 0 1 2-2z"/><path d="M9 8h6M9 11h6"/>'},
-  {id:"settings", label:"管理", icon:'<circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/>'}
+  {id:"glossary", label:"用語集", icon:'<path d="M5 4h11a2 2 0 0 1 2 2v14l-6-3-6 3V6a2 2 0 0 1 2-2z"/><path d="M9 8h6M9 11h6"/>'}
 ];
 
 /* ============================================================
@@ -924,20 +888,12 @@ if(!state.examHistory) state.examHistory = [];
 if(!state.wrongIds) state.wrongIds = {};
 
 /* ============================================================
-   CLOUD SYNC (Firebase Auth + Firestore)
+   CLOUD SYNC (Firebase Auth + Firestore, optional)
    ============================================================ */
-var FIREBASE_CONFIG = {
-  apiKey: "AIzaSyA2r7QRygB1jtOp-kwrRTh8R5zKrYFs5II",
-  authDomain: "ai901-study.firebaseapp.com",
-  projectId: "ai901-study",
-  storageBucket: "ai901-study.firebasestorage.app",
-  messagingSenderId: "508949528301",
-  appId: "1:508949528301:web:54c85440f9c2f24f8456e4",
-  measurementId: "G-8EGKC4JD1W"
-};
+var FB_CONFIG_KEY = "ai901_firebase_config_v1";
 var FIREBASE_SDK_VERSION = "10.14.1";
 var fbApp = null, fbAuth = null, fbDb = null, fbUser = null, fbLastSynced = null, fbSyncTimer = null;
-var fbLoadPromise = null, fbInitError = null;
+var fbLoadPromise = null;
 
 function loadScriptTag(src){
   return new Promise(function(resolve, reject){
@@ -956,10 +912,23 @@ function ensureFirebaseSdkLoaded(){
     .then(function(){ return loadScriptTag(base+"firebase-firestore-compat.js"); });
   return fbLoadPromise;
 }
-function initFirebase(){
+function loadFirebaseConfigFromStorage(){
+  try{
+    var raw = localStorage.getItem(FB_CONFIG_KEY);
+    return raw ? JSON.parse(raw) : null;
+  }catch(e){ return null; }
+}
+function extractFirebaseConfig(text){
+  var match = text.match(/\{[\s\S]*\}/);
+  if(!match) throw new Error("設定オブジェクトが見つかりません");
+  var obj = new Function("return (" + match[0] + ")")();
+  if(!obj || !obj.apiKey || !obj.projectId) throw new Error("apiKey / projectId が見つかりません");
+  return obj;
+}
+function initFirebase(config){
   return ensureFirebaseSdkLoaded().then(function(){
     if(!fbApp){
-      fbApp = firebase.initializeApp(FIREBASE_CONFIG);
+      fbApp = firebase.initializeApp(config);
       fbAuth = firebase.auth();
       fbDb = firebase.firestore();
       fbAuth.onAuthStateChanged(function(user){
@@ -969,22 +938,19 @@ function initFirebase(){
       });
     }
     renderCloudPanel();
-  }).catch(function(err){
-    fbInitError = err;
-    renderCloudPanel();
+  });
+}
+function saveFirebaseConfigAndInit(config){
+  try{ localStorage.setItem(FB_CONFIG_KEY, JSON.stringify(config)); }catch(e){}
+  initFirebase(config).catch(function(err){
+    alert("Firebaseの初期化に失敗しました。設定内容を確認してください。\n"+err.message);
   });
 }
 function firebaseSignIn(){
-  var run = fbAuth ? Promise.resolve() : initFirebase();
-  run.then(function(){
-    if(!fbAuth){
-      alert("Firebaseの読み込みに失敗しました。通信状況を確認して、ページを再読み込みしてください。");
-      return;
-    }
-    var provider = new firebase.auth.GoogleAuthProvider();
-    fbAuth.signInWithPopup(provider).catch(function(err){
-      alert("ログインに失敗しました。\n"+err.message);
-    });
+  if(!fbAuth) return;
+  var provider = new firebase.auth.GoogleAuthProvider();
+  fbAuth.signInWithPopup(provider).catch(function(err){
+    alert("ログインに失敗しました。\n"+err.message);
   });
 }
 function firebaseSignOut(){
@@ -1047,18 +1013,36 @@ function scheduleCloudPush(){
 function renderCloudPanel(){
   var panel = document.getElementById("cloud-panel");
   if(!panel) return;
-  if(fbInitError){
+  var cfg = loadFirebaseConfigFromStorage();
+  if(!cfg){
     panel.innerHTML =
-      '<p class="data-panel-note">クラウド同期の読み込みに失敗しました。通信状況を確認して、ページを再読み込みしてください。</p>'+
-      '<div class="btn-row"><button class="btn btn-ghost" id="fb-retry-btn">再読み込み</button></div>';
-    document.getElementById("fb-retry-btn").addEventListener("click", function(){ location.reload(); });
+      '<p class="data-panel-note">Firebase を設定すると、Google アカウントでログインするだけで複数の端末・ブラウザ間で学習の進捗を自動的に同期できます。'+
+      'Firebase コンソールで作成した設定 (firebaseConfig) をそのまま下に貼り付けてください。</p>'+
+      '<textarea id="fb-config-input" rows="6" placeholder="const firebaseConfig = { apiKey: &quot;...&quot;, authDomain: &quot;...&quot;, projectId: &quot;...&quot; };" style="width:100%;box-sizing:border-box;font-family:\'JetBrains Mono\',monospace;font-size:12px;padding:10px;border-radius:10px;border:1px solid var(--border);background:var(--surface-2);color:var(--text);"></textarea>'+
+      '<div class="btn-row" style="margin-top:12px;"><button class="btn btn-primary" id="fb-config-save">設定を保存して同期を有効にする</button></div>';
+    document.getElementById("fb-config-save").addEventListener("click", function(){
+      var raw = document.getElementById("fb-config-input").value;
+      try{
+        var cfgObj = extractFirebaseConfig(raw);
+        saveFirebaseConfigAndInit(cfgObj);
+      }catch(e){
+        alert("設定の読み取りに失敗しました。Firebase コンソールに表示される firebaseConfig をそのまま貼り付けてください。");
+      }
+    });
     return;
   }
   if(!fbUser){
     panel.innerHTML =
-      '<p class="data-panel-note">Google アカウントでログインすると、この端末の進捗をクラウドと同期できます。別の端末でも同じアカウントでログインするだけで、続きから学習できます。</p>'+
-      '<div class="btn-row"><button class="btn btn-primary" id="fb-signin-btn">Google でログインして同期</button></div>';
+      '<p class="data-panel-note">Firebase の設定は保存済みです。Google アカウントでログインすると、この端末の進捗をクラウドと同期できます。</p>'+
+      '<div class="btn-row"><button class="btn btn-primary" id="fb-signin-btn">Google でログインして同期</button>'+
+      '<button class="btn btn-ghost" id="fb-config-clear">設定を削除</button></div>';
     document.getElementById("fb-signin-btn").addEventListener("click", firebaseSignIn);
+    document.getElementById("fb-config-clear").addEventListener("click", function(){
+      if(confirm("保存した Firebase の設定を削除します。よろしいですか?")){
+        try{ localStorage.removeItem(FB_CONFIG_KEY); }catch(e){}
+        location.reload();
+      }
+    });
     return;
   }
   var lastText = fbLastSynced ? ("最終同期: "+fbLastSynced.toLocaleString("ja-JP")) : "同期待ち…";
@@ -1072,13 +1056,6 @@ function renderCloudPanel(){
 }
 
 function chapterInfo(id){ for(var i=0;i<CHAPTERS.length;i++){ if(CHAPTERS[i].id===id) return CHAPTERS[i]; } return CHAPTERS[0]; }
-function chapterContextHTML(chId, count, unitLabel){
-  if(chId===0 || chId==="wrong"){
-    return "全章 <span class=\"ctx-sub\">(全"+count+unitLabel+")</span>";
-  }
-  var ch = chapterInfo(chId);
-  return "第"+ch.id+"章 &middot; "+ch.title+" <span class=\"ctx-sub\">("+count+unitLabel+")</span>";
-}
 function cardsOf(ch){ return ch ? FLASHCARDS.filter(function(c){return c.ch===ch;}) : FLASHCARDS.slice(); }
 function quizOf(ch){ return ch ? QUIZ.filter(function(q){return q.ch===ch;}) : QUIZ.slice(); }
 function shuffle(arr){
@@ -1111,7 +1088,7 @@ function renderNav(){
 }
 function goTo(view){
   currentView = view;
-  ["home","flash","quiz","exam","glossary","settings"].forEach(function(v){
+  ["home","flash","quiz","exam","glossary"].forEach(function(v){
     document.getElementById("view-"+v).hidden = (v!==view);
   });
   renderNav();
@@ -1120,7 +1097,6 @@ function goTo(view){
   if(view==="quiz") renderQuizSetup();
   if(view==="exam") renderExamSetup();
   if(view==="glossary") renderGlossary();
-  if(view==="settings") renderCloudPanel();
   window.scrollTo({top:0,behavior:"instant"});
 }
 
@@ -1142,7 +1118,7 @@ function overallStats(){
 }
 function renderHome(){
   var greetEl = document.getElementById("home-greeting");
-  greetEl.textContent = "今日も学習を始めましょう";
+  greetEl.textContent = "Yoshiさん、学習を始めましょう";
 
   var s = overallStats();
   document.getElementById("stat-mastered").textContent = s.masteredCount;
@@ -1172,6 +1148,7 @@ function renderHome(){
     });
     grid.appendChild(card);
   });
+  renderCloudPanel();
 }
 
 /* ============================================================
@@ -1237,7 +1214,7 @@ document.getElementById("data-import-file").addEventListener("change", function(
 /* ============================================================
    FLASHCARDS
    ============================================================ */
-var flashState = {chapter:0, deck:[], index:0, flipped:false, mode:"card"};
+var flashState = {chapter:0, deck:[], index:0, flipped:false};
 
 function renderFlashSetup(){
   var pillRow = document.getElementById("flash-chapter-pills");
@@ -1261,9 +1238,7 @@ function buildDeck(){
   flashState.index = 0;
   flashState.flipped = false;
   renderFlashSetup_pillsOnly();
-  document.getElementById("flash-chapter-title").innerHTML = chapterContextHTML(flashState.chapter, flashState.deck.length, "語");
   renderCard();
-  renderFlashList();
 }
 function renderFlashSetup_pillsOnly(){
   var pillRow = document.getElementById("flash-chapter-pills");
@@ -1273,47 +1248,10 @@ function renderFlashSetup_pillsOnly(){
     el.classList.toggle("active", active);
   });
 }
-function setFlashMode(mode){
-  flashState.mode = mode;
-  Array.prototype.forEach.call(document.querySelectorAll("#flash-mode-toggle .seg-btn"), function(btn){
-    btn.classList.toggle("active", btn.getAttribute("data-mode")===mode);
-  });
-  document.getElementById("fc-wrap").hidden = (mode!=="card");
-  document.getElementById("fc-list-wrap").hidden = (mode!=="list");
-}
-Array.prototype.forEach.call(document.querySelectorAll("#flash-mode-toggle .seg-btn"), function(btn){
-  btn.addEventListener("click", function(){ setFlashMode(btn.getAttribute("data-mode")); });
-});
-function renderFlashList(){
-  var list = document.getElementById("fc-list");
-  list.innerHTML = "";
-  var chapters = flashState.chapter===0 ? CHAPTERS : CHAPTERS.filter(function(c){ return c.id===flashState.chapter; });
-  chapters.forEach(function(ch){
-    var items = cardsOf(ch.id);
-    if(items.length===0) return;
-    var group = document.createElement("div");
-    group.className = "gloss-group";
-    group.style.setProperty("--gc", ch.color);
-    var h = document.createElement("h3");
-    h.innerHTML = "第"+ch.id+"章 &middot; " + ch.title;
-    group.appendChild(h);
-    var dl = document.createElement("dl");
-    items.forEach(function(c){
-      var status = state.cards[c.id];
-      var item = document.createElement("div");
-      item.className = "gloss-item" + (status ? " status-"+status : "");
-      item.innerHTML = '<dt>'+c.term+'</dt><dd>'+c.def+'</dd>';
-      dl.appendChild(item);
-    });
-    group.appendChild(dl);
-    list.appendChild(group);
-  });
-}
 function renderCard(){
   var deck = flashState.deck;
   if(deck.length===0){
     document.getElementById("fc-term").textContent = "この章のカードはありません";
-    document.getElementById("fc-term-back").textContent = "";
     document.getElementById("fc-def").textContent = "";
     document.getElementById("fc-count").textContent = "0 / 0";
     return;
@@ -1321,7 +1259,6 @@ function renderCard(){
   var card = deck[flashState.index];
   var ch = chapterInfo(card.ch);
   document.getElementById("fc-term").textContent = card.term;
-  document.getElementById("fc-term-back").textContent = card.term;
   document.getElementById("fc-def").textContent = card.def;
   document.getElementById("fc-tag-front").textContent = "第"+card.ch+"章";
   document.getElementById("fc-tag-back").textContent = "第"+card.ch+"章";
@@ -1362,7 +1299,6 @@ function markCard(status){
   state.cards[card.id] = status;
   saveState();
   renderCard();
-  renderFlashList();
   setTimeout(nextCard, 260);
 }
 document.getElementById("flashcard").addEventListener("click", flip);
@@ -1378,7 +1314,6 @@ document.getElementById("fc-reset").addEventListener("click", function(){
   delete state.cards[card.id];
   saveState();
   renderCard();
-  renderFlashList();
 });
 document.addEventListener("keydown", function(e){
   if(currentView!=="flash") return;
@@ -1395,7 +1330,6 @@ function renderQuizSetup(){
   document.getElementById("quiz-setup").hidden = false;
   document.getElementById("quiz-play").hidden = true;
   document.getElementById("quiz-result").hidden = true;
-  document.getElementById("quiz-play-chapter-title").hidden = true;
 
   var wrongIds = Object.keys(state.wrongIds||{}).filter(function(id){ return QUIZ.some(function(q){ return q.id===id; }); });
   var wrongPanel = document.getElementById("quiz-wrong-panel");
@@ -1421,7 +1355,6 @@ function renderQuizSetup(){
     }));
   });
   if(quizState.chapter===0 || quizState.chapter==="wrong") quizState.chapter = CHAPTERS[0].id;
-  document.getElementById("quiz-chapter-title").innerHTML = chapterContextHTML(quizState.chapter, quizOf(quizState.chapter).length, "問");
 }
 document.getElementById("quiz-start-btn").addEventListener("click", function(){
   startQuiz(quizState.chapter);
@@ -1436,14 +1369,6 @@ function startQuiz(ch){
   document.getElementById("quiz-setup").hidden = true;
   document.getElementById("quiz-result").hidden = true;
   document.getElementById("quiz-play").hidden = false;
-  var playTitle = document.getElementById("quiz-play-chapter-title");
-  if(ch==="wrong"){
-    playTitle.innerHTML = "苦手問題の復習 <span class=\"ctx-sub\">("+pool.length+"問)</span>";
-    playTitle.hidden = false;
-  }else{
-    playTitle.innerHTML = chapterContextHTML(ch, pool.length, "問");
-    playTitle.hidden = false;
-  }
   renderQuizQuestion(quizState, "quiz-play", function(){ finishQuiz(); });
 }
 function renderQuizQuestion(qs, containerId, onFinish){
@@ -1505,7 +1430,6 @@ function renderQuizQuestion(qs, containerId, onFinish){
 }
 function finishQuiz(quit){
   document.getElementById("quiz-play").hidden = true;
-  document.getElementById("quiz-play-chapter-title").hidden = true;
   var result = document.getElementById("quiz-result");
   result.hidden = false;
   var correctCount = quizState.answers.filter(function(a){ return a.chosen===a.correct; }).length;
@@ -1716,8 +1640,11 @@ renderHome();
 renderFlashSetup();
 renderQuizSetup();
 renderExamSetup();
-renderCloudPanel();
-initFirebase();
+
+var savedFbConfig = loadFirebaseConfigFromStorage();
+if(savedFbConfig){
+  initFirebase(savedFbConfig).catch(function(err){ console.error("firebase init failed", err); });
+}
 })();
 </script>
 </body>
