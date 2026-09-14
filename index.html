@@ -515,6 +515,37 @@ a{color:var(--accent);}
 .seg-btn{border:none; background:none; padding:8px 18px; border-radius:9px; font-size:13.5px; font-weight:700; color:var(--text-muted); cursor:pointer; font-family:inherit;}
 .seg-btn.active{background:var(--surface); color:var(--accent); box-shadow:0 1px 4px rgba(0,0,0,.10);}
 
+/* ============ Listen mode (聞き流し) ============ */
+.listen-panel{max-width:560px; margin:0 auto; display:flex; flex-direction:column; gap:18px;}
+.listen-now-card{
+  background:var(--surface); border:1px solid var(--border); border-radius:20px;
+  padding:28px 26px; box-shadow:0 12px 30px -18px hsl(var(--shadow) / .35);
+  display:flex; flex-direction:column; gap:10px;
+  transition:border-color .2s;
+}
+.listen-panel.is-playing .listen-now-card{border-color:var(--accent);}
+.listen-top-row{position:static; justify-content:flex-start; margin-bottom:2px;}
+.listen-term{font-size:22px; font-weight:900; font-family:"Zen Kaku Gothic New";}
+.listen-def{font-size:15px; color:var(--text-muted); line-height:1.6;}
+.listen-controls{display:flex; align-items:center; justify-content:center; gap:14px;}
+.listen-playbtn{min-width:130px;}
+.listen-options{
+  display:flex; flex-wrap:wrap; gap:14px 22px; align-items:center; justify-content:center;
+  background:var(--surface-2); border-radius:14px; padding:14px 16px;
+}
+.listen-opt{font-size:13px; font-weight:700; color:var(--text-muted); display:flex; align-items:center; gap:6px;}
+.listen-opt select{
+  font-family:inherit; font-size:13px; font-weight:700; color:var(--text);
+  background:var(--surface); border:1px solid var(--border); border-radius:8px; padding:5px 8px;
+}
+.listen-check{cursor:pointer;}
+.listen-check input{width:15px; height:15px; accent-color:var(--accent);}
+.listen-opt-wide{flex-basis:100%; justify-content:center;}
+.listen-opt-wide select{max-width:280px; text-overflow:ellipsis;}
+.listen-voice-hint{font-size:12px; color:var(--accent); text-align:center; margin:0; font-weight:700;}
+.listen-voice-hint:empty{display:none;}
+.listen-note{font-size:12px; color:var(--text-faint); text-align:center; line-height:1.6; margin:0;}
+
 /* ============ Bottom tab bar (mobile) ============ */
 .tabbar{
   display:none;
@@ -600,6 +631,7 @@ a{color:var(--accent);}
       <div class="seg-toggle" id="flash-mode-toggle">
         <button class="seg-btn active" data-mode="card">カード</button>
         <button class="seg-btn" data-mode="list">一覧(テキスト)</button>
+        <button class="seg-btn" data-mode="listen">聞き流し</button>
       </div>
       <div class="fc-wrap" id="fc-wrap">
         <div class="fc-progress">
@@ -639,6 +671,44 @@ a{color:var(--accent);}
       </div>
       <div id="fc-list-wrap" hidden>
         <div id="fc-list"></div>
+      </div>
+      <div id="fc-listen-wrap" hidden>
+        <div class="listen-panel">
+          <div class="listen-now-card">
+            <div class="fc-top-row listen-top-row">
+              <span class="fc-tag" id="listen-tag">第1章</span>
+              <span class="fc-cat" id="listen-cat">カテゴリ</span>
+            </div>
+            <div class="listen-term" id="listen-term">–</div>
+            <div class="listen-def" id="listen-def">聞き流しモードを開始すると、用語と説明を読み上げます。</div>
+          </div>
+          <div class="fc-progress">
+            <span class="mono" id="listen-count">0 / 0</span>
+            <div class="progress-track"><div class="progress-fill" id="listen-progress-fill" style="width:0%"></div></div>
+          </div>
+          <div class="listen-controls">
+            <button class="iconbtn" id="listen-prev" title="前へ" aria-label="前へ"><svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 18l-6-6 6-6"/></svg></button>
+            <button class="btn btn-primary listen-playbtn" id="listen-playpause">再生</button>
+            <button class="iconbtn" id="listen-next" title="次へ" aria-label="次へ"><svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 18l6-6-6-6"/></svg></button>
+          </div>
+          <div class="listen-options">
+            <label class="listen-opt listen-opt-wide">音声
+              <select id="listen-voice"><option value="">読み込み中…</option></select>
+            </label>
+            <label class="listen-opt">再生速度
+              <select id="listen-speed">
+                <option value="0.8">遅い (0.8x)</option>
+                <option value="1" selected>標準 (1.0x)</option>
+                <option value="1.2">速い (1.2x)</option>
+                <option value="1.5">かなり速い (1.5x)</option>
+              </select>
+            </label>
+            <label class="listen-opt listen-check"><input type="checkbox" id="listen-shuffle" checked> シャッフル再生</label>
+            <label class="listen-opt listen-check"><input type="checkbox" id="listen-loop" checked> くり返し再生</label>
+          </div>
+          <p class="listen-voice-hint" id="listen-voice-hint"></p>
+          <p class="listen-note" id="listen-note">端末の音声合成機能を使って読み上げます。画面ロック中やアプリを切り替えた場合、端末によっては再生が止まることがあります。より自然な声を増やすには、iPhoneは「設定 > アクセシビリティ > スピーチ > 音声」、Androidは「設定 > テキスト読み上げの出力」から日本語音声を追加でダウンロードできます。</p>
+        </div>
       </div>
     </section>
 
@@ -1144,6 +1214,7 @@ function renderNav(){
   });
 }
 function goTo(view){
+  if(currentView==="flash" && view!=="flash") pauseListen();
   currentView = view;
   ["home","flash","quiz","exam","glossary","settings"].forEach(function(v){
     document.getElementById("view-"+v).hidden = (v!==view);
@@ -1298,6 +1369,7 @@ function buildDeck(){
   document.getElementById("flash-chapter-title").innerHTML = chapterContextHTML(flashState.chapter, flashState.deck.length, "語");
   renderCard();
   renderFlashList();
+  buildListenQueue();
 }
 function renderFlashSetup_pillsOnly(){
   var pillRow = document.getElementById("flash-chapter-pills");
@@ -1308,12 +1380,14 @@ function renderFlashSetup_pillsOnly(){
   });
 }
 function setFlashMode(mode){
+  if(flashState.mode==="listen" && mode!=="listen") pauseListen();
   flashState.mode = mode;
   Array.prototype.forEach.call(document.querySelectorAll("#flash-mode-toggle .seg-btn"), function(btn){
     btn.classList.toggle("active", btn.getAttribute("data-mode")===mode);
   });
   document.getElementById("fc-wrap").hidden = (mode!=="card");
   document.getElementById("fc-list-wrap").hidden = (mode!=="list");
+  document.getElementById("fc-listen-wrap").hidden = (mode!=="listen");
 }
 Array.prototype.forEach.call(document.querySelectorAll("#flash-mode-toggle .seg-btn"), function(btn){
   btn.addEventListener("click", function(){ setFlashMode(btn.getAttribute("data-mode")); });
@@ -1447,6 +1521,181 @@ document.addEventListener("keydown", function(e){
   if(currentView!=="flash") return;
   if(e.key==="ArrowRight") nextCard();
   if(e.key==="ArrowLeft") prevCard();
+});
+
+/* ============================================================
+   LISTEN MODE (聞き流し / 音声読み上げ)
+   ============================================================ */
+var speechSupported = (typeof window!=="undefined" && "speechSynthesis" in window);
+var listenState = {queue:[], index:0, playing:false, speed:1, loop:true, shuffleOn:true};
+var listenVoice = null;
+
+var LISTEN_VOICE_PREF_KEY = "ai901_voice_pref_v1";
+function getJapaneseVoices(){
+  if(!speechSupported) return [];
+  try{
+    return (window.speechSynthesis.getVoices() || []).filter(function(v){ return /^ja/i.test(v.lang); });
+  }catch(e){ return []; }
+}
+function populateVoiceSelect(){
+  var sel = document.getElementById("listen-voice");
+  var hint = document.getElementById("listen-voice-hint");
+  if(!sel) return;
+  var jaVoices = getJapaneseVoices();
+  var prevValue = sel.value;
+  sel.innerHTML = "";
+  if(jaVoices.length===0){
+    var opt = document.createElement("option");
+    opt.value = "";
+    opt.textContent = "端末の標準音声を使用";
+    sel.appendChild(opt);
+    sel.disabled = true;
+    listenVoice = null;
+    if(hint) hint.textContent = "";
+    return;
+  }
+  sel.disabled = false;
+  jaVoices.forEach(function(v){
+    var o = document.createElement("option");
+    o.value = v.name;
+    o.textContent = v.name + (v.localService ? "" : " (ネットワーク)");
+    sel.appendChild(o);
+  });
+  var saved = null;
+  try{ saved = window.localStorage.getItem(LISTEN_VOICE_PREF_KEY); }catch(e){}
+  var names = jaVoices.map(function(v){ return v.name; });
+  var pick = (saved && names.indexOf(saved)>-1) ? saved : (names.indexOf(prevValue)>-1 ? prevValue : names[0]);
+  sel.value = pick;
+  listenVoice = jaVoices.filter(function(v){ return v.name===pick; })[0] || jaVoices[0];
+  if(hint) hint.textContent = jaVoices.length>1 ? "この端末には日本語音声が"+jaVoices.length+"種類あります。聞き比べて自然なものを選べます。" : "";
+}
+if(speechSupported){
+  populateVoiceSelect();
+  if("onvoiceschanged" in window.speechSynthesis){
+    window.speechSynthesis.onvoiceschanged = function(){ populateVoiceSelect(); };
+  }
+}
+function buildListenQueue(){
+  var cards = cardsOf(flashState.chapter);
+  listenState.queue = listenState.shuffleOn ? shuffle(cards) : cards.slice();
+  listenState.index = 0;
+  renderListenCard();
+}
+function renderListenCard(){
+  var q = listenState.queue;
+  var panel = document.querySelector(".listen-panel");
+  if(q.length===0){
+    document.getElementById("listen-term").textContent = "この章のカードはありません";
+    document.getElementById("listen-def").textContent = "";
+    document.getElementById("listen-count").textContent = "0 / 0";
+    document.getElementById("listen-progress-fill").style.width = "0%";
+    return;
+  }
+  var card = q[listenState.index];
+  var ch = chapterInfo(card.ch);
+  document.getElementById("listen-tag").textContent = "第"+card.ch+"章";
+  document.getElementById("listen-tag").style.setProperty("--ch-color", ch.color);
+  document.getElementById("listen-cat").textContent = card.cat || "";
+  document.getElementById("listen-term").textContent = card.term;
+  document.getElementById("listen-def").textContent = card.def;
+  document.getElementById("listen-count").textContent = (listenState.index+1) + " / " + q.length;
+  document.getElementById("listen-progress-fill").style.width = pct(listenState.index+1, q.length)+"%";
+  if(panel) panel.classList.toggle("is-playing", listenState.playing);
+}
+function speakCard(card){
+  if(!speechSupported) return;
+  window.speechSynthesis.cancel();
+  var utter = new SpeechSynthesisUtterance(card.term + "。" + card.def);
+  utter.lang = "ja-JP";
+  if(listenVoice) utter.voice = listenVoice;
+  utter.rate = listenState.speed;
+  utter.onend = function(){
+    if(!listenState.playing) return;
+    setTimeout(function(){
+      if(!listenState.playing) return;
+      advanceListen();
+    }, 500);
+  };
+  utter.onerror = function(){ /* ignore, e.g. cancelled mid-utterance */ };
+  window.speechSynthesis.speak(utter);
+}
+function advanceListen(){
+  var q = listenState.queue;
+  if(q.length===0){ listenState.playing = false; updatePlayButton(); return; }
+  if(listenState.index+1 < q.length){
+    listenState.index++;
+  }else if(listenState.loop){
+    listenState.index = 0;
+  }else{
+    listenState.playing = false;
+    updatePlayButton();
+    renderListenCard();
+    return;
+  }
+  renderListenCard();
+  speakCard(q[listenState.index]);
+}
+function playListen(){
+  if(!speechSupported || listenState.queue.length===0) return;
+  listenState.playing = true;
+  updatePlayButton();
+  renderListenCard();
+  speakCard(listenState.queue[listenState.index]);
+}
+function pauseListen(){
+  if(!speechSupported) return;
+  listenState.playing = false;
+  window.speechSynthesis.cancel();
+  updatePlayButton();
+  var panel = document.querySelector(".listen-panel");
+  if(panel) panel.classList.remove("is-playing");
+}
+function updatePlayButton(){
+  var btn = document.getElementById("listen-playpause");
+  if(!btn) return;
+  btn.textContent = listenState.playing ? "一時停止" : "再生";
+}
+function listenGoTo(newIndex){
+  var q = listenState.queue;
+  if(q.length===0) return;
+  listenState.index = ((newIndex % q.length) + q.length) % q.length;
+  renderListenCard();
+  if(listenState.playing) speakCard(q[listenState.index]);
+}
+if(!speechSupported){
+  var listenNoteEl = document.getElementById("listen-note");
+  if(listenNoteEl) listenNoteEl.textContent = "この端末・ブラウザは音声読み上げに対応していません。";
+  var playBtnEl = document.getElementById("listen-playpause");
+  if(playBtnEl) playBtnEl.disabled = true;
+  var voiceSelEl = document.getElementById("listen-voice");
+  if(voiceSelEl){
+    voiceSelEl.innerHTML = '<option value="">利用できません</option>';
+    voiceSelEl.disabled = true;
+  }
+}
+document.getElementById("listen-voice").addEventListener("change", function(e){
+  var jaVoices = getJapaneseVoices();
+  var match = jaVoices.filter(function(v){ return v.name===e.target.value; })[0];
+  listenVoice = match || null;
+  try{ window.localStorage.setItem(LISTEN_VOICE_PREF_KEY, e.target.value); }catch(err){}
+  if(listenState.playing) speakCard(listenState.queue[listenState.index]);
+});
+document.getElementById("listen-playpause").addEventListener("click", function(){
+  if(listenState.playing) pauseListen(); else playListen();
+});
+document.getElementById("listen-prev").addEventListener("click", function(){ listenGoTo(listenState.index-1); });
+document.getElementById("listen-next").addEventListener("click", function(){ listenGoTo(listenState.index+1); });
+document.getElementById("listen-speed").addEventListener("change", function(e){
+  listenState.speed = parseFloat(e.target.value) || 1;
+  if(listenState.playing) speakCard(listenState.queue[listenState.index]);
+});
+document.getElementById("listen-shuffle").addEventListener("change", function(e){
+  listenState.shuffleOn = e.target.checked;
+  buildListenQueue();
+  if(listenState.playing) speakCard(listenState.queue[listenState.index]);
+});
+document.getElementById("listen-loop").addEventListener("change", function(e){
+  listenState.loop = e.target.checked;
 });
 
 /* ============================================================
